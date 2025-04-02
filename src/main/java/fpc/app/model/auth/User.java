@@ -33,6 +33,7 @@ public class User {
 	private String password;
 
 	@ManyToMany
+	@Builder.Default
 	@JoinTable(
 		name = "user_role",
 		schema = "app",

@@ -1,48 +1,70 @@
 package fpc.app.dto.app;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fpc.app.model.app.IdentityDocument;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.*;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "User registration data")
 public class RegisterUserRequest {
 
-  @NotBlank String name;
+  @NotBlank
+  @Size(min = 3, max = 250)
+  @Schema(description = "First and middle name")
+  private String name;
 
   @NotBlank
+  @Size(min = 3, max = 250)
+  @Schema(description = "Last name")
   @JsonProperty("last_name")
-  String lastName;
+  private String lastName;
 
-  @NotBlank String gender;
-
-  @NotNull
-  @PastOrPresent
-  @JsonProperty("birth_date")
-  LocalDate birthDate;
+  @Email
+  @NotBlank
+  @Size(min = 5, max = 250)
+  private String email;
 
   @NotNull
-  @JsonProperty("doc_type")
-  IdentityDocument identityDocument;
+  @Min(1)
+  @JsonProperty("doc_type_id")
+  @Schema(example = "1")
+  private Long documentTypeId;
 
   @NotBlank
   @JsonProperty("doc_number")
-  String documentNumber;
+  @Size(min = 6, max = 25)
+  @Pattern(regexp = "^\\d+$")
+  @Schema(description = "Must be a number", example = "12345678")
+  private String documentNumber;
 
-  @Email @NotBlank String email;
+  @Pattern(regexp = "^([MF])$")
+  @Schema(example = "M")
+  private String gender;
 
-  @NotBlank String password;
-  
-  @NotBlank String phone;
+  @Past
+  @NotNull
+  @JsonProperty("birth_date")
+  @Schema(description = "Past date", example = "2000-01-01")
+  private LocalDate birthDate;
+
+  @Size(min = 7, max = 10)
+  @JsonProperty("phone_number")
+  @Schema(description = "Must be a number", example = "12344321")
+  private String phoneNumber;
+
+  @NotBlank
+  @Size(min = 6, max = 250)
+  @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d]{8,250}$")
+  @Schema(
+      description =
+          "Password must contain at least one uppercase letter, one lowercase letter, one number, and be between 8 and 250 characters long")
+  private String password;
 }

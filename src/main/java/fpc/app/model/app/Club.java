@@ -1,6 +1,7 @@
 package fpc.app.model.app;
 
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -21,6 +22,7 @@ public class Club {
 	@NotBlank
 	private String name;
 
+	@Nullable
 	@Column(name = "crest_image_id", length = 250)
 	private String crestImageId;
 }

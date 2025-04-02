@@ -23,4 +23,8 @@ public class IdentityDocument {
 	@NotBlank
 	@Column(name = "abbreviation", nullable = false, unique = true, length = 4)
 	private String abbreviation;
+
+	public IdentityDocument(Long id) {
+		this.id = id;
+	}
 }

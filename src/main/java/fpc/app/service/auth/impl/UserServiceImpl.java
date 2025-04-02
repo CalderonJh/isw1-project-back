@@ -3,6 +3,7 @@ package fpc.app.service.auth.impl;
 import fpc.app.dto.app.RegisterUserRequest;
 import fpc.app.exception.DataNotFoundException;
 import fpc.app.exception.ValidationException;
+import fpc.app.model.app.IdentityDocument;
 import fpc.app.model.app.Person;
 import fpc.app.model.auth.Role;
 import fpc.app.model.auth.User;
@@ -35,12 +36,9 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(
 			User.builder()
 				.person(person)
-				.username(request.getDocumentNumber())
+				.username(request.getEmail())
 				.password(encoder.encode(request.getPassword()))
-				.roles(List.of(new Role(
-					1L,
-					"ROLE_USER"
-				)))
+				.roles(List.of(new Role(1L)))
 				.build());
 		return jwtUtil.generateToken(person.getDocumentNumber());
 	}
@@ -50,10 +48,9 @@ public class UserServiceImpl implements UserService {
 			.name(request.getName())
 			.lastName(request.getLastName())
 			.birthday(request.getBirthDate())
-			.gender(request.getGender())
-			.documentType(request.getIdentityDocument())
+			.gender(request.getGender()).documentType(new IdentityDocument(request.getDocumentTypeId()))
 			.documentNumber(request.getDocumentNumber())
-			.phone(request.getPhone())
+			.phone(request.getPhoneNumber())
 			.email(request.getEmail())
 			.build();
 	}
@@ -64,8 +61,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private void validateDocument(RegisterUserRequest request) {
-		if (personRepository.existsByDocumentTypeIdAndDocumentNumber(
-			request.getIdentityDocument().getId(), request.getDocumentNumber()))
+		if (personRepository.existsByDocumentTypeIdAndDocumentNumber(request.getDocumentTypeId(), request.getDocumentNumber()))
 			throw new ValidationException("Error: Document is already in use");
 	}
 

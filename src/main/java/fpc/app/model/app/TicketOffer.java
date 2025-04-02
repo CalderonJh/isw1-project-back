@@ -1,5 +1,6 @@
 package fpc.app.model.app;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -36,6 +37,7 @@ public class TicketOffer {
 	@Column(name = "end_date", nullable = false)
 	private Date endDate;
 
+	@Nullable
 	@Column(name = "image_id")
 	private String imageId;
 }

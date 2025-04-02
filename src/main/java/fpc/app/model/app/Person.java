@@ -43,7 +43,6 @@ public class Person {
 	@Column(name = "birthday", nullable = false)
 	private LocalDate birthday;
 
-	@NotBlank
 	@Column(name = "gender", nullable = false, length = 1)
 	@Pattern(regexp = "[MF]")
 	private String gender;
@@ -53,7 +52,6 @@ public class Person {
 	@Column(name = "email", nullable = false, unique = true, length = 250)
 	private String email;
 
-	@NotBlank
 	@Column(name = "phone", nullable = false, length = 20)
 	@Pattern(regexp = "\\d{7,20}")
 	private String phone;

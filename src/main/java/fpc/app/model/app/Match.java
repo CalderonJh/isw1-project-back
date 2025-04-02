@@ -1,6 +1,8 @@
 package fpc.app.model.app;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -27,6 +29,16 @@ public class Match {
 	@NotNull
 	@JoinColumn(name = "away_team_id", nullable = false)
 	private Club awayClub;
+
+	@NotNull
+	@Column(name = "year", nullable = false)
+	private Integer year;
+
+	@NotNull
+	@Column(name = "season", nullable = false)
+	@Min(1)
+	@Max(2)
+	private Integer season;
 
 	@ManyToOne
 	@NotNull
