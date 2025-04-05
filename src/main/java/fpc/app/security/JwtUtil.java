@@ -1,14 +1,15 @@
 package fpc.app.security;
 
+import static fpc.app.constant.Constant.TOKEN_EXPIRATION_TIME;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
+import javax.crypto.SecretKey;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
@@ -20,13 +21,11 @@ public class JwtUtil {
     return Keys.hmacShaKeyFor(secret.getBytes());
   }
 
-  // generates a token based on the email
-  public String generateToken(String email) {
-    final long hours = 24;
+  public String generateToken(String username) {
     return Jwts.builder()
-        .subject(email)
+        .subject(username)
         .issuedAt(new Date())
-        .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * hours))
+        .expiration(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION_TIME))
         .signWith(getSigningKey())
         .compact();
   }

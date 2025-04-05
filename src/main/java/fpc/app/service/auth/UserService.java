@@ -5,9 +5,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import fpc.app.dto.app.RegisterUserRequest;
 public interface UserService {
 
-  User getByEmail(String email);
+  User getByUsername(String username);
 
   UserDetails loadUser(String email);
 
-  String registerUser(RegisterUserRequest request);
+  User save(RegisterUserRequest request);
 }
