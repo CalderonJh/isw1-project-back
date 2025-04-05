@@ -65,6 +65,7 @@ public class RegisterUserRequest {
   @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d]{8,250}$")
   @Schema(
       description =
-          "Password must contain at least one uppercase letter, one lowercase letter, one number, and be between 8 and 250 characters long")
+          "Password must contain at least one uppercase letter, one lowercase letter, one number, and be between 6 and 250 characters long",
+      example = "Hello1234")
   private String password;
 }
