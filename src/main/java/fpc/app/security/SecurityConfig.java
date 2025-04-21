@@ -55,14 +55,16 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
-                        "/auth/**",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**",
-                        "/bus/v3/api-docs/**")
+                        "/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/bus/v3/api-docs/**")
                     .permitAll()
+                    .requestMatchers("/club-admin/**")
+                    .hasRole("CLUB_ADMIN")
+                    .requestMatchers("/su/**")
+                    .hasRole("SUPERUSER")
                     .anyRequest()
                     .authenticated())
         .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
     return http.build();
   }
 

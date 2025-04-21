@@ -3,10 +3,9 @@ package fpc.app.model.auth;
 import fpc.app.model.app.Person;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -32,13 +31,12 @@ public class User {
 	@Column(nullable = false)
 	private String password;
 
-	@ManyToMany
-	@Builder.Default
-	@JoinTable(
-		name = "user_role",
-		schema = "app",
-		joinColumns = @JoinColumn(name = "user_id"),
-		inverseJoinColumns = @JoinColumn(name = "role_id")
-	)
-	private List<Role> roles = new ArrayList<>();
+  @ManyToMany
+  @Builder.Default
+  @JoinTable(
+      name = "user_role",
+      schema = "app",
+      joinColumns = @JoinColumn(name = "user_id"),
+      inverseJoinColumns = @JoinColumn(name = "role_id"))
+  private Set<Role> roles = new HashSet<>();
 }
