@@ -1,5 +1,6 @@
 package fpc.app.service.auth.impl;
 
+import static fpc.app.util.Tools.hasText;
 import static java.util.Objects.requireNonNull;
 
 import fpc.app.dto.app.RegisterUserRequest;
@@ -9,11 +10,13 @@ import fpc.app.model.app.Person;
 import fpc.app.model.auth.Role;
 import fpc.app.model.auth.User;
 import fpc.app.repository.app.PersonRepository;
+import fpc.app.repository.auth.RoleRepository;
 import fpc.app.repository.auth.UserRepository;
 import fpc.app.service.auth.UserService;
 import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +29,7 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder encoder;
   private final UserRepository userRepository;
   private final PersonRepository personRepository;
+  private final RoleRepository roleRepository;
 
   @Override
   @Transactional
@@ -37,7 +41,7 @@ public class UserServiceImpl implements UserService {
             .person(person)
             .username(request.getEmail())
             .password(encoder.encode(request.getPassword()))
-            .roles(List.of(new Role(1L)))
+            .roles(Set.of(roleRepository.findByName("USER").orElseThrow()))
             .build());
   }
 
@@ -81,5 +85,15 @@ public class UserServiceImpl implements UserService {
   @Override
   public @Nullable User getByUsername(String username) {
     return userRepository.findByUsername(username).orElse(null);
+  }
+
+  @Override
+  public List<User> list(String keyword) {
+    return hasText(keyword) ? userRepository.findAll() : userRepository.findByKeyword(keyword);
+  }
+
+  @Override
+  public List<Role> listRoles() {
+    return roleRepository.findAll();
   }
 }

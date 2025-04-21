@@ -6,9 +6,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -38,17 +40,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       }
     }
 
-    // If the token is valid and has not previously authenticated, we proceed to load the user details
     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
       var userDetails = userService.loadUser(username);
       if (jwtUtil.isTokenValid(jwt, userDetails.getUsername())) {
+        List<String> roles = jwtUtil.extractRoles(jwt);
+        List<SimpleGrantedAuthority> authorities =
+            roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).toList();
         UsernamePasswordAuthenticationToken token =
-            new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
+            new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
         token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(token);
       }
     }
+
     chain.doFilter(request, response);
   }
 }

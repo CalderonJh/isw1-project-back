@@ -6,8 +6,10 @@ import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -36,9 +38,25 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
   }
 
+  @ExceptionHandler({NoSuchElementException.class})
+  public ResponseEntity<ErrorDetails> handleNoSuchElementException(
+      NoSuchElementException ex, WebRequest request) {
+    ErrorDetails errorDetails =
+        new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+    return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler({NullPointerException.class})
+  public ResponseEntity<ErrorDetails> handleNullPointerException(
+      NullPointerException ex, WebRequest request) {
+    ErrorDetails errorDetails =
+        new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+    return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+  }
+
   @ExceptionHandler({ValidationException.class})
   public ResponseEntity<ErrorDetails> handleValidationException(
-      DataNotFoundException ex, WebRequest request) {
+      ValidationException ex, WebRequest request) {
     ErrorDetails errorDetails =
         new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
     return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
@@ -89,5 +107,13 @@ public class GlobalExceptionHandler {
     errorResponse.setErrors(errors);
 
     return ResponseEntity.badRequest().body(errorResponse);
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorDetails> handleAccessDenied(
+      AccessDeniedException ex, WebRequest request) {
+    ErrorDetails errorDetails =
+        new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+    return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
   }
 }

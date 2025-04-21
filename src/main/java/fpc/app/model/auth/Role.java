@@ -1,13 +1,14 @@
 package fpc.app.model.auth;
 
-import lombok.*;
 import jakarta.persistence.*;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Entity
 @Table(name = "role", schema = "app")
 public class Role {
@@ -17,8 +18,4 @@ public class Role {
 
 	@Column(nullable = false, unique = true, length = 100)
 	private String name;
-
-	public Role(Long id) {
-		this.id = id;
-	}
 }
