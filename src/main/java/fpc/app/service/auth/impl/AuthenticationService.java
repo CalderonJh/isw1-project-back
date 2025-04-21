@@ -1,7 +1,9 @@
 package fpc.app.service.auth.impl;
 
 import fpc.app.dto.app.RegisterUserRequest;
+import fpc.app.model.app.IdentityDocument;
 import fpc.app.model.auth.User;
+import fpc.app.repository.app.IdentityDocumentRepository;
 import fpc.app.security.JwtUtil;
 import fpc.app.service.auth.UserService;
 import jakarta.validation.Valid;
@@ -9,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static java.util.Objects.isNull;
 
@@ -18,6 +22,7 @@ public class AuthenticationService {
   private final UserService userService;
   private final JwtUtil jwtUtil;
   private final PasswordEncoder encoder;
+  private final IdentityDocumentRepository identityDocumentRepository;
 
   public String login(String username, String password) {
     User user = userService.getByUsername(username);
@@ -29,5 +34,9 @@ public class AuthenticationService {
   public String register(@Valid RegisterUserRequest request) {
     User user = userService.save(request);
     return jwtUtil.generateToken(user.getUsername());
+  }
+
+  public List<IdentityDocument> getIdentityDocumentTypes() {
+    return identityDocumentRepository.findAll();
   }
 }

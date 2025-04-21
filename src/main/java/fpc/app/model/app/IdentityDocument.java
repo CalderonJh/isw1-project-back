@@ -18,7 +18,7 @@ public class IdentityDocument {
 
 	@NotBlank
 	@Column(name = "name", nullable = false, unique = true, length = 100)
-	private String name;
+	private String description;
 
 	@NotBlank
 	@Column(name = "abbreviation", nullable = false, unique = true, length = 4)
