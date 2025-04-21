@@ -55,10 +55,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
-                        "/fpc/api/auth/**",
-                        "/fpc/api/swagger-ui/**",
-                        "/fpc/api/v3/api-docs/**",
-                        "/fpc/api/bus/v3/api-docs/**",
+                        "/auth/**",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
                         "/bus/v3/api-docs/**")
