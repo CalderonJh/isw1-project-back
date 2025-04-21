@@ -33,8 +33,12 @@ public class Tools {
     return suggestion;
   }
 
-  public static Object mapSuggestion(Object id, String description) {
+  public static Suggestion mapSuggestion(Object id, String description) {
     return new Suggestion(id, description);
+  }
+
+  public static boolean hasText(String text) {
+    return text != null && !text.isBlank();
   }
 
   private Tools() {}

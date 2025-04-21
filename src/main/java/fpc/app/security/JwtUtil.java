@@ -2,10 +2,13 @@ package fpc.app.security;
 
 import static fpc.app.constant.Constant.TOKEN_EXPIRATION_TIME;
 
+import fpc.app.model.auth.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,9 +24,10 @@ public class JwtUtil {
     return Keys.hmacShaKeyFor(secret.getBytes());
   }
 
-  public String generateToken(String username) {
+  public String generateToken(User user) {
     return Jwts.builder()
-        .subject(username)
+        .subject(user.getUsername())
+        .claim("roles", user.getRoles())
         .issuedAt(new Date())
         .expiration(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION_TIME))
         .signWith(getSigningKey())
@@ -52,5 +56,11 @@ public class JwtUtil {
 
   public boolean isTokenExpired(String token) {
     return extractClaim(token, Claims::getExpiration).before(new Date());
+  }
+
+  public List<String> extractRoles(String token) {
+    Claims claims = extractAllClaims(token);
+    List<?> rawRoles = (List<?>) claims.get("roles");
+    return rawRoles.stream().map(role -> ((Map<?, ?>) role).get("name").toString()).toList();
   }
 }
