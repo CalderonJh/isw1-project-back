@@ -3,7 +3,7 @@ package fpc.app.controller;
 import static fpc.app.util.Tools.mapSuggestion;
 
 import fpc.app.dto.util.Suggestion;
-import fpc.app.service.auth.SuperuserService;
+import fpc.app.service.app.SuperuserService;
 import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Superuser operations")
 @RequiredArgsConstructor
 public class SuperuserController {
-
   private final SuperuserService superuserService;
   private final UserService userService;
 
@@ -27,8 +26,12 @@ public class SuperuserController {
   @Operation(summary = "Assign a role to a user")
   @Parameter(name = "userId", description = "ID of the user to assign the role to")
   @Parameter(name = "roleId", description = "ID of the role to assign to the user")
-  public ResponseEntity<Void> giveRole(@RequestParam Long userId, @RequestParam Long roleId) {
-    superuserService.giveRole(userId, roleId);
+  @Parameter(name = "clubId", description = "Required if the role is club admin")
+  public ResponseEntity<Void> giveRole(
+      @RequestParam Long userId,
+      @RequestParam Long roleId,
+      @RequestParam(required = false) Long clubId) {
+    superuserService.giveRole(userId, roleId, clubId);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
