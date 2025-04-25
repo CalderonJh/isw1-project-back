@@ -18,11 +18,15 @@ public class Club {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "name", nullable = false, length = 250, unique = true)
-	@NotBlank
-	private String name;
+  @NotBlank
+  @Column(name = "name", nullable = false, length = 250, unique = true)
+  private String name;
 
-	@Nullable
-	@Column(name = "crest_image_id", length = 250)
-	private String crestImageId;
+  @Nullable
+  @Column(name = "image_id", length = 250)
+  private String imageId;
+
+  @NotBlank
+  @Column(name = "short_name", length = 50, unique = true)
+  private String shortName;
 }
