@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/su")
 @Tag(name = "Superuser operations")
 @RequiredArgsConstructor
-public class SuperuserController {
+public class UserRoleController {
   private final SuperuserService superuserService;
   private final UserService userService;
 

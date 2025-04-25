@@ -42,4 +42,9 @@ public class Tools {
   }
 
   private Tools() {}
+
+  public static String removeExtraSpaces(String str) {
+    if (str == null) return null;
+    return str.replaceAll("\\s+", " ").trim();
+  }
 }
