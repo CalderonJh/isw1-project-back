@@ -44,9 +44,9 @@ public class StadiumServiceImpl implements StadiumService {
         clubAdminRepository
             .findByUserId(user.getId())
             .orElseThrow(() -> new DataNotFoundException("User is not a club admin"));
-    validateStadiumName(dto.getName(), clubAdmin.getClub());
-    Stadium stadium = Stadium.builder().name(dto.getName()).club(clubAdmin.getClub()).build();
-    addStands(stadium, dto.getStands());
+    validateStadiumName(dto.name(), clubAdmin.getClub());
+    Stadium stadium = Stadium.builder().name(dto.name()).club(clubAdmin.getClub()).build();
+    addStands(stadium, dto.stands());
     saveImage(stadium, image);
     stadiumRepository.save(stadium);
   }
@@ -62,18 +62,18 @@ public class StadiumServiceImpl implements StadiumService {
   }
 
   private void addStands(Stadium stadium, List<StandDTO> stands) {
-    stands.forEach(stand -> stadium.addStand(new Stand(stand.getName(), stand.getCapacity())));
+    stands.forEach(stand -> stadium.addStand(new Stand(stand.name(), stand.capacity())));
   }
 
   @Override
   public void updateStadium(String username, Long stadiumId, StadiumDTO dto) {
     Stadium stadium = requireNonNull(getStadium(username, stadiumId));
     validateStadiumAccess(username, stadium.getClub());
-    String name = removeExtraSpaces(dto.getName());
-    if (!equalsText(stadium.getName(), name)) validateStadiumName(dto.getName(), stadium.getClub());
+    String name = removeExtraSpaces(dto.name());
+    if (!equalsText(stadium.getName(), name)) validateStadiumName(dto.name(), stadium.getClub());
     stadium.setName(name);
     stadium.clearStands();
-    addStands(stadium, dto.getStands());
+    addStands(stadium, dto.stands());
     stadiumRepository.save(stadium);
   }
 

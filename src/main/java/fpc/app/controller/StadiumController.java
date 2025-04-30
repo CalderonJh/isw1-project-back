@@ -1,8 +1,9 @@
 package fpc.app.controller;
 
 import fpc.app.dto.app.StadiumDTO;
-import fpc.app.mapper.StadiumMapper;
+import fpc.app.dto.app.StandDTO;
 import fpc.app.model.app.Stadium;
+import fpc.app.model.app.Stand;
 import fpc.app.security.JwtUtil;
 import fpc.app.service.app.StadiumService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class StadiumController {
   private final StadiumService stadiumService;
   private final JwtUtil jwtUtil;
-  private static final StadiumMapper MAPPER = StadiumMapper.INSTANCE;
 
   @PostMapping("/create")
   @Operation(summary = "Create a new stadium")
@@ -49,7 +49,7 @@ public class StadiumController {
       @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
     String username = jwtUtil.extractEmail(token);
     List<Stadium> stadiums = stadiumService.getStadiums(username);
-    return ResponseEntity.ok(MAPPER.toDTO(stadiums));
+    return ResponseEntity.ok(stadiums.stream().map(this::mapStadiumDTO).toList());
   }
 
   @GetMapping("/{id}")
@@ -58,7 +58,7 @@ public class StadiumController {
       @RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable Long id) {
     String username = jwtUtil.extractEmail(token);
     Stadium stadium = stadiumService.getStadium(username, id);
-    return ResponseEntity.ok(MAPPER.toDTO(stadium));
+    return ResponseEntity.ok(mapStadiumDTO(stadium));
   }
 
   @DeleteMapping("/delete/{id}")
@@ -68,5 +68,15 @@ public class StadiumController {
     String username = jwtUtil.extractEmail(token);
     stadiumService.deleteStadium(username, id);
     return ResponseEntity.ok().build();
+  }
+
+  private StadiumDTO mapStadiumDTO(Stadium stadium) {
+    if (stadium == null) return null;
+    return new StadiumDTO(
+        stadium.getName(), stadium.getStands().stream().map(this::mapStandDTO).toList());
+  }
+
+  private StandDTO mapStandDTO(Stand stand) {
+    return new StandDTO(stand.getName(), stand.getCapacity());
   }
 }
