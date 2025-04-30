@@ -27,7 +27,7 @@ public class AuthController {
   @Operation(summary = "Use credentials to generate token")
   @PostMapping("/login")
   public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest loginRequest) {
-    String token = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
+    String token = authService.login(loginRequest.username(), loginRequest.password());
     return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, token).build();
   }
 

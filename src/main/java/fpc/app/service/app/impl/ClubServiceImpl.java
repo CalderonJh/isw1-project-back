@@ -68,8 +68,8 @@ public class ClubServiceImpl implements ClubService {
   }
 
   private void setClubInfo(ClubRequest request, MultipartFile file, Club club) {
-    club.setName(removeExtraSpaces(request.getName()).toUpperCase());
-    club.setShortName(removeExtraSpaces(request.getShortName()).toUpperCase());
+    club.setName(removeExtraSpaces(request.name()).toUpperCase());
+    club.setShortName(removeExtraSpaces(request.shortName()).toUpperCase());
     if (file != null) {
       if (club.getImageId() != null) cloudinaryService.deleteImage(club.getImageId());
       String imgId = cloudinaryService.uploadImage(file);

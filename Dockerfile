@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-alpine AS builder
+FROM  eclipse-temurin:21-jdk AS builder
 ARG MS_NAME=fpc-backend
 WORKDIR /app
 
@@ -10,7 +10,7 @@ RUN ./mvnw dependency:resolve
 COPY ./src /app/src/
 RUN ./mvnw clean package -DskipTests
 
-FROM openjdk:17-jdk-alpine
+FROM  eclipse-temurin:21-jdk
 WORKDIR /app
 RUN mkdir ./logs
 
