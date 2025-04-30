@@ -16,11 +16,11 @@ public class CloudinaryService {
 
   private final Cloudinary cloudinary;
 
-  public Map uploadImage(MultipartFile file) {
+  public String uploadImage(MultipartFile file) {
     try {
       Map<String, String> options = new HashMap<>();
       options.put("resource_type", "auto");
-      return cloudinary.uploader().upload(file.getBytes(), options);
+      return cloudinary.uploader().upload(file.getBytes(), options).get("public_id").toString();
     } catch (IOException e) {
       throw new TechnicalException("Image upload failed", e);
     }

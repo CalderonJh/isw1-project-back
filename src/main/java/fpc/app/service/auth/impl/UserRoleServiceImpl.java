@@ -1,4 +1,4 @@
-package fpc.app.service.app.impl;
+package fpc.app.service.auth.impl;
 
 import static java.util.Objects.requireNonNull;
 
@@ -13,7 +13,7 @@ import fpc.app.repository.app.ClubAdminRepository;
 import fpc.app.repository.auth.RoleRepository;
 import fpc.app.repository.auth.UserRepository;
 import fpc.app.service.app.ClubService;
-import fpc.app.service.app.SuperuserService;
+import fpc.app.service.auth.UserRoleService;
 import java.util.Date;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class SuperuserServiceImpl implements SuperuserService {
+public class UserRoleServiceImpl implements UserRoleService {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
   private final ClubAdminRepository clubAdminRepository;
