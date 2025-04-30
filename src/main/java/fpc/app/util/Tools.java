@@ -3,6 +3,8 @@ package fpc.app.util;
 import fpc.app.dto.util.Suggestion;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -46,5 +48,9 @@ public class Tools {
   public static String removeExtraSpaces(String str) {
     if (str == null) return null;
     return str.replaceAll("\\s+", " ").trim();
+  }
+
+  public static boolean equalsText(@NonNull String text1, @NonNull String text2) {
+    return removeExtraSpaces(text1).equalsIgnoreCase(removeExtraSpaces(text2));
   }
 }

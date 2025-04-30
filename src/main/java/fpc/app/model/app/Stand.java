@@ -17,11 +17,6 @@ public class Stand {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotNull
-	@ManyToOne
-	@JoinColumn(name = "stadium_id")
-	private Stadium stadium;
-
 	@NotBlank
 	@Column(name = "name", nullable = false, length = 250)
 	private String name;
@@ -29,4 +24,9 @@ public class Stand {
 	@NotNull
 	@Column(name = "capacity", nullable = false)
 	private Integer capacity;
+
+	public Stand(String name, Integer capacity) {
+		this.name = name;
+		this.capacity = capacity;
+	}
 }
