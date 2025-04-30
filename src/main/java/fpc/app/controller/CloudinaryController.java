@@ -8,7 +8,6 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/images")
@@ -18,7 +17,7 @@ public class CloudinaryController {
   private final CloudinaryService cloudinaryService;
 
   @GetMapping("/{publicId}")
-  @Operation(description = "Get image URL by public ID")
+  @Operation(summary = "Get image URL by public ID")
   public ResponseEntity<Map<String, String>> getImage(@PathVariable String publicId) {
     String url = cloudinaryService.getImageUrl(publicId);
     Map<String, String> response = new HashMap<>();
@@ -26,23 +25,8 @@ public class CloudinaryController {
     return ResponseEntity.ok(response);
   }
 
-  @PostMapping("/upload")
-  @Operation(description = "Upload an image")
-  public ResponseEntity<Void> uploadImage(@RequestPart("file") MultipartFile file) {
-    System.out.println("Uploading image: " + file.getOriginalFilename());
-    cloudinaryService.uploadImage(file);
-    return ResponseEntity.ok().build();
-  }
-
-  @DeleteMapping("/{publicId}")
-  @Operation(description = "Delete an image by public ID")
-  public ResponseEntity<String> deleteImage(@PathVariable String publicId) {
-    String result = cloudinaryService.deleteImage(publicId);
-    return ResponseEntity.ok(result);
-  }
-
   @GetMapping("/{publicId}/resize")
-  @Operation(description = "Get resized image URL by public ID")
+  @Operation(summary = "Get resized image URL by public ID")
   public ResponseEntity<Map<String, String>> getResizedImage(
       @PathVariable String publicId,
       @RequestParam(defaultValue = "300") int width,
