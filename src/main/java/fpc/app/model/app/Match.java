@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import lombok.*;
-
-import java.util.Date;
 
 @Getter
 @Setter
@@ -45,6 +44,6 @@ public class Match {
 	@JoinColumn(name = "stadium_id", nullable = false)
 	private Stadium stadium;
 
-	@Column(name = "start_time", nullable = false)
-	private Date startDate;
+  @Column(name = "start_time", nullable = false)
+  private LocalDateTime startDate;
 }
