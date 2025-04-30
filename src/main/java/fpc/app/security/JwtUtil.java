@@ -36,6 +36,8 @@ public class JwtUtil {
 
   // extracts the email from the token
   public String extractEmail(String token) {
+    final String authPrefix = "Bearer ";
+    if (token.startsWith(authPrefix)) token = token.substring(authPrefix.length());
     return extractClaim(token, Claims::getSubject);
   }
 

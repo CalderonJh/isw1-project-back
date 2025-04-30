@@ -1,8 +1,11 @@
 package fpc.app.controller;
 
+import fpc.app.dto.app.ClubDTO;
 import fpc.app.dto.app.ClubRequest;
 import fpc.app.service.app.ClubService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +20,7 @@ public class ClubController {
 
   @PostMapping("/create")
   public ResponseEntity<Void> create(
-      @RequestPart(value = "file", required = false) MultipartFile file,
+      @RequestPart(value = "image", required = false) MultipartFile file,
       @RequestPart("club") ClubRequest request) {
     clubService.createClub(request, file);
     return ResponseEntity.ok().build();
@@ -32,4 +35,10 @@ public class ClubController {
     return ResponseEntity.ok().build();
   }
 
+  @GetMapping("/list")
+  @Operation(summary = "List all clubs")
+  public ResponseEntity<List<ClubDTO>> list() {
+    List<ClubDTO> clubs = clubService.list();
+    return ResponseEntity.ok(clubs);
+  }
 }

@@ -3,7 +3,7 @@ package fpc.app.controller;
 import static fpc.app.util.Tools.mapSuggestion;
 
 import fpc.app.dto.util.Suggestion;
-import fpc.app.service.app.SuperuserService;
+import fpc.app.service.auth.UserRoleService;
 import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Superuser operations")
 @RequiredArgsConstructor
 public class UserRoleController {
-  private final SuperuserService superuserService;
+  private final UserRoleService userRoleService;
   private final UserService userService;
 
   @PostMapping("/give-role")
@@ -31,7 +31,7 @@ public class UserRoleController {
       @RequestParam Long userId,
       @RequestParam Long roleId,
       @RequestParam(required = false) Long clubId) {
-    superuserService.giveRole(userId, roleId, clubId);
+    userRoleService.giveRole(userId, roleId, clubId);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
@@ -40,7 +40,7 @@ public class UserRoleController {
   @Parameter(name = "userId", description = "ID of the user to revoke the role from")
   @Parameter(name = "roleId", description = "ID of the role to revoke from the user")
   public ResponseEntity<Void> revokeRole(@RequestParam Long userId, @RequestParam Long roleId) {
-    superuserService.revokeRole(userId, roleId);
+    userRoleService.revokeRole(userId, roleId);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
