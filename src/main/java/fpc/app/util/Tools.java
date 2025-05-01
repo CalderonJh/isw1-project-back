@@ -1,9 +1,9 @@
 package fpc.app.util;
 
 import fpc.app.dto.util.Suggestion;
+import fpc.app.exception.DataNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,5 +52,19 @@ public class Tools {
 
   public static boolean equalsText(@NonNull String text1, @NonNull String text2) {
     return removeExtraSpaces(text1).equalsIgnoreCase(removeExtraSpaces(text2));
+  }
+
+  public static <E> E requiredEntity(E entity) {
+    if (entity == null) {
+      throw new DataNotFoundException("Entity not found");
+    }
+    return entity;
+  }
+
+  public static <E> E requiredEntity(E entity, String message) {
+    if (entity == null) {
+      throw new DataNotFoundException(message);
+    }
+    return entity;
   }
 }

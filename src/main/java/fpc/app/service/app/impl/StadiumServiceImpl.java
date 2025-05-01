@@ -39,7 +39,7 @@ public class StadiumServiceImpl implements StadiumService {
   @Override
   @Transactional
   public void createStadium(String username, StadiumDTO dto, MultipartFile image) {
-    User user = requireNonNull(userService.getByUsername(username));
+    User user = requiredEntity(userService.getByUsername(username));
     ClubAdmin clubAdmin =
         clubAdminRepository
             .findByUserId(user.getId())
@@ -67,7 +67,7 @@ public class StadiumServiceImpl implements StadiumService {
 
   @Override
   public void updateStadium(String username, Long stadiumId, StadiumDTO dto) {
-    Stadium stadium = requireNonNull(getStadium(username, stadiumId));
+    Stadium stadium = requiredEntity(getStadium(username, stadiumId));
     validateStadiumAccess(username, stadium.getClub());
     String name = removeExtraSpaces(dto.name());
     if (!equalsText(stadium.getName(), name)) validateStadiumName(dto.name(), stadium.getClub());
@@ -85,7 +85,7 @@ public class StadiumServiceImpl implements StadiumService {
 
   @Override
   public void deleteStadium(String username, Long id) {
-    Stadium stadium = requireNonNull(getStadium(username, id));
+    Stadium stadium = requiredEntity(getStadium(username, id));
     validateStadiumAccess(username, stadium.getClub());
     stadiumRepository.delete(stadium);
   }
