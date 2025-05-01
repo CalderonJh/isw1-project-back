@@ -1,7 +1,7 @@
 package fpc.app.service.auth.impl;
 
 import static fpc.app.util.Tools.hasText;
-import static java.util.Objects.requireNonNull;
+import static fpc.app.util.Tools.requireData;
 
 import fpc.app.dto.app.RegisterUserRequest;
 import fpc.app.exception.ValidationException;
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserDetails loadUser(String email) {
-    User user =requiredEntity(getByUsername(email));
+    User user = requireData(getByUsername(email));
     return new org.springframework.security.core.userdetails.User(
         user.getUsername(), user.getPassword(), new ArrayList<>());
   }
