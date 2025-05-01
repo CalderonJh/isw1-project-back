@@ -7,6 +7,7 @@ import fpc.app.model.app.Stand;
 import fpc.app.security.JwtUtil;
 import fpc.app.service.app.StadiumService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/club-admin/stadium")
 @RequiredArgsConstructor
+@Tag(name = "Stadium", description = "Stadium management")
 public class StadiumController {
   private final StadiumService stadiumService;
   private final JwtUtil jwtUtil;

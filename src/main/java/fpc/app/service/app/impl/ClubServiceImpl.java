@@ -62,7 +62,7 @@ public class ClubServiceImpl implements ClubService {
   @Override
   @Transactional
   public void update(Long clubId, ClubRequest request, MultipartFile file) {
-    Club club = requireNonNull(this.getClub(clubId));
+    Club club =requiredEntity(this.getClub(clubId));
     setClubInfo(request, file, club);
     clubRepository.save(club);
   }

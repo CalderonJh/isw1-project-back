@@ -5,6 +5,7 @@ import fpc.app.model.app.Match;
 import fpc.app.security.JwtUtil;
 import fpc.app.service.app.MatchService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/club-admin/match")
 @RequiredArgsConstructor
+@Tag(name = "Match", description = "Match management")
 public class MatchController {
   private final JwtUtil jwtUtil;
   private final MatchService matchService;
