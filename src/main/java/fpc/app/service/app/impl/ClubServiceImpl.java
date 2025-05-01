@@ -1,7 +1,7 @@
 package fpc.app.service.app.impl;
 
 import static fpc.app.util.Tools.removeExtraSpaces;
-import static java.util.Objects.requireNonNull;
+import static fpc.app.util.Tools.requireData;
 
 import fpc.app.dto.app.ClubDTO;
 import fpc.app.dto.app.ClubRequest;
@@ -62,7 +62,7 @@ public class ClubServiceImpl implements ClubService {
   @Override
   @Transactional
   public void update(Long clubId, ClubRequest request, MultipartFile file) {
-    Club club =requiredEntity(this.getClub(clubId));
+    Club club = requireData(this.getClub(clubId));
     setClubInfo(request, file, club);
     clubRepository.save(club);
   }

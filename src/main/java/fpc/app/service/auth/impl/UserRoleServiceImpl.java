@@ -1,5 +1,6 @@
 package fpc.app.service.auth.impl;
 
+
 import static fpc.app.util.Tools.requireData;
 
 import fpc.app.constant.UserRole;

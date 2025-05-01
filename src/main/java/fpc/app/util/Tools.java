@@ -54,14 +54,14 @@ public class Tools {
     return removeExtraSpaces(text1).equalsIgnoreCase(removeExtraSpaces(text2));
   }
 
-  public static <E> E requiredEntity(E entity) {
+  public static <E> E requireData(E entity) {
     if (entity == null) {
       throw new DataNotFoundException("Entity not found");
     }
     return entity;
   }
 
-  public static <E> E requiredEntity(E entity, String message) {
+  public static <E> E requireData(E entity, String message) {
     if (entity == null) {
       throw new DataNotFoundException(message);
     }
