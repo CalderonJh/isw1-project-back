@@ -1,6 +1,5 @@
 package fpc.app.dto.app;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
@@ -24,7 +23,6 @@ public class RegisterUserRequest {
   @NotBlank
   @Size(min = 3, max = 250)
   @Schema(description = "Last name")
-  @JsonProperty("last_name")
   private String lastName;
 
   @Email
@@ -34,12 +32,10 @@ public class RegisterUserRequest {
 
   @NotNull
   @Min(1)
-  @JsonProperty("doc_type_id")
   @Schema(example = "1")
   private Long documentTypeId;
 
   @NotBlank
-  @JsonProperty("doc_number")
   @Size(min = 6, max = 25)
   @Pattern(regexp = "^\\d+$")
   @Schema(description = "Must be a number", example = "12345678")
@@ -51,12 +47,10 @@ public class RegisterUserRequest {
 
   @Past
   @NotNull
-  @JsonProperty("birth_date")
   @Schema(description = "Past matchDate", example = "2000-01-01")
   private LocalDate birthDate;
 
   @Size(min = 7, max = 10)
-  @JsonProperty("phone_number")
   @Schema(description = "Must be a number", example = "12344321")
   private String phoneNumber;
 

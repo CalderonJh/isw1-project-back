@@ -1,5 +1,6 @@
 package fpc.app.service.app.impl;
 
+import static fpc.app.util.Tools.requiredEntity;
 import static java.util.Objects.requireNonNull;
 
 import fpc.app.dto.app.MatchDTO;
@@ -66,9 +67,9 @@ public class MatchServiceImpl implements MatchService {
   @Override
   public void update(String username, MatchDTO dto) {
     Club club = clubService.getClubByAdmin(username);
-    Match match = requireNonNull(getMatch(dto.matchId()));
+    Match match =requiredEntity(getMatch(dto.matchId()));
     if (dto.stadiumId().equals(match.getStadium().getId())) {
-      Stadium stadium = requireNonNull(stadiumService.getStadium(username, dto.stadiumId()));
+      Stadium stadium =requiredEntity(stadiumService.getStadium(username, dto.stadiumId()));
       validateStadium(stadium, club);
       match.setStadium(stadium);
     }
