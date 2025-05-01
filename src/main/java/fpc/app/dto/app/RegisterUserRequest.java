@@ -52,7 +52,7 @@ public class RegisterUserRequest {
   @Past
   @NotNull
   @JsonProperty("birth_date")
-  @Schema(description = "Past date", example = "2000-01-01")
+  @Schema(description = "Past matchDate", example = "2000-01-01")
   private LocalDate birthDate;
 
   @Size(min = 7, max = 10)
