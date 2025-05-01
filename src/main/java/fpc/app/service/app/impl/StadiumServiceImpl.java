@@ -1,8 +1,6 @@
 package fpc.app.service.app.impl;
 
-import static fpc.app.util.Tools.equalsText;
-import static fpc.app.util.Tools.removeExtraSpaces;
-import static java.util.Objects.requireNonNull;
+import static fpc.app.util.Tools.*;
 
 import fpc.app.dto.app.StadiumDTO;
 import fpc.app.dto.app.StandDTO;
@@ -39,7 +37,7 @@ public class StadiumServiceImpl implements StadiumService {
   @Override
   @Transactional
   public void createStadium(String username, StadiumDTO dto, MultipartFile image) {
-    User user = requiredEntity(userService.getByUsername(username));
+    User user = requireData(userService.getByUsername(username));
     ClubAdmin clubAdmin =
         clubAdminRepository
             .findByUserId(user.getId())
@@ -67,7 +65,7 @@ public class StadiumServiceImpl implements StadiumService {
 
   @Override
   public void updateStadium(String username, Long stadiumId, StadiumDTO dto) {
-    Stadium stadium = requiredEntity(getStadium(username, stadiumId));
+    Stadium stadium = requireData(getStadium(username, stadiumId));
     validateStadiumAccess(username, stadium.getClub());
     String name = removeExtraSpaces(dto.name());
     if (!equalsText(stadium.getName(), name)) validateStadiumName(dto.name(), stadium.getClub());
@@ -85,7 +83,7 @@ public class StadiumServiceImpl implements StadiumService {
 
   @Override
   public void deleteStadium(String username, Long id) {
-    Stadium stadium = requiredEntity(getStadium(username, id));
+    Stadium stadium = requireData(getStadium(username, id));
     validateStadiumAccess(username, stadium.getClub());
     stadiumRepository.delete(stadium);
   }
