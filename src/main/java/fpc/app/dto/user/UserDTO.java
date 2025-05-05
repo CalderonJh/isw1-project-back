@@ -1,5 +1,6 @@
-package fpc.app.dto.app;
+package fpc.app.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "User registration data")
-public class RegisterUserRequest {
+public class UserDTO {
 
   @NotBlank
   @Size(min = 3, max = 250)
@@ -57,9 +58,10 @@ public class RegisterUserRequest {
   @NotBlank
   @Size(min = 6, max = 250)
   @Pattern(
-      regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d]{8,250}$",
+      regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,250}$",
       message =
           "Password must contain at least one uppercase letter, one lowercase letter, one number, and be between 6 and 250 characters long")
   @Schema(example = "Hello1234")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String password;
 }
