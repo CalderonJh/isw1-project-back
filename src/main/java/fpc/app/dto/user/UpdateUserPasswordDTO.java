@@ -1,4 +1,4 @@
-package fpc.app.dto.app;
+package fpc.app.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ public record UpdateUserPasswordDTO(
     @NotBlank
         @Size(min = 6, max = 250)
         @Pattern(
-            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d]{8,250}$",
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,250}$",
             message =
                 "Password must contain at least one uppercase letter, one lowercase letter, one number, and be between 6 and 250 characters long")
         @Schema(example = "Hello1234")

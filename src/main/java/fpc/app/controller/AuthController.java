@@ -1,8 +1,8 @@
 package fpc.app.controller;
 
 
-import fpc.app.dto.app.UserDTO;
-import fpc.app.dto.auth.LoginRequest;
+import fpc.app.dto.user.UserDTO;
+import fpc.app.dto.user.LoginRequest;
 import fpc.app.dto.util.Suggestion;
 import fpc.app.model.app.IdentityDocument;
 import fpc.app.service.auth.impl.AuthenticationService;
