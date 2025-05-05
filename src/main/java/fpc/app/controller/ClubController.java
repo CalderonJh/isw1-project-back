@@ -1,7 +1,7 @@
 package fpc.app.controller;
 
 import fpc.app.dto.app.ClubDTO;
-import fpc.app.dto.app.ClubRequest;
+import fpc.app.dto.app.ClubCreateDTO;
 import fpc.app.service.app.ClubService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +21,7 @@ public class ClubController {
   @PostMapping("/create")
   public ResponseEntity<Void> create(
       @RequestPart(value = "image", required = false) MultipartFile file,
-      @RequestPart("club") ClubRequest request) {
+      @RequestPart("club") ClubCreateDTO request) {
     clubService.createClub(request, file);
     return ResponseEntity.ok().build();
   }
@@ -30,7 +30,7 @@ public class ClubController {
   public ResponseEntity<Void> update(
       @PathVariable Long clubId,
       @RequestPart(value = "file", required = false) MultipartFile file,
-      @RequestPart("club") ClubRequest request) {
+      @RequestPart("club") ClubCreateDTO request) {
     clubService.update(clubId, request, file);
     return ResponseEntity.ok().build();
   }

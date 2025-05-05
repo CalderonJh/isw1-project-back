@@ -1,7 +1,7 @@
 package fpc.app.controller;
 
 
-import fpc.app.dto.app.RegisterUserRequest;
+import fpc.app.dto.app.UserDTO;
 import fpc.app.dto.auth.LoginRequest;
 import fpc.app.dto.util.Suggestion;
 import fpc.app.model.app.IdentityDocument;
@@ -35,7 +35,7 @@ public class AuthController {
   @ApiResponse(responseCode = "200", description = "User registered successfully")
   @ApiResponse(responseCode = "409", description = "If validation fails")
   @PostMapping("/register")
-  public ResponseEntity<Void> register(@RequestBody @Valid RegisterUserRequest request) {
+  public ResponseEntity<Void> register(@RequestBody @Valid UserDTO request) {
     String token = authService.register(request);
     return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, token).build();
   }

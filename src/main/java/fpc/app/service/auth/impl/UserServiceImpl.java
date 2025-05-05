@@ -1,9 +1,9 @@
 package fpc.app.service.auth.impl;
 
-import static fpc.app.util.Tools.hasText;
-import static fpc.app.util.Tools.requireData;
+import static fpc.app.util.Tools.*;
 
-import fpc.app.dto.app.RegisterUserRequest;
+import fpc.app.dto.app.UpdateUserDTO;
+import fpc.app.dto.app.UserDTO;
 import fpc.app.exception.ValidationException;
 import fpc.app.model.app.IdentityDocument;
 import fpc.app.model.app.Person;
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User save(RegisterUserRequest request) {
+  public User save(UserDTO request) {
     validateUserRegistrationRequest(request);
     Person person = savePersonInfo(request);
     return userRepository.save(
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
             .build());
   }
 
-  private Person savePersonInfo(RegisterUserRequest request) {
+  private Person savePersonInfo(UserDTO request) {
     return personRepository.save(
         Person.builder()
             .name(request.getName())
@@ -59,12 +59,12 @@ public class UserServiceImpl implements UserService {
             .build());
   }
 
-  private void validateUserRegistrationRequest(RegisterUserRequest request) {
+  private void validateUserRegistrationRequest(UserDTO request) {
     validateEmail(request.getEmail());
     validateDocument(request);
   }
 
-  private void validateDocument(RegisterUserRequest request) {
+  private void validateDocument(UserDTO request) {
     if (personRepository.existsByDocumentTypeIdAndDocumentNumber(
         request.getDocumentTypeId(), request.getDocumentNumber()))
       throw new ValidationException("Ya hay un usuario registrado con ese documento");
@@ -95,5 +95,27 @@ public class UserServiceImpl implements UserService {
   @Override
   public List<Role> listRoles() {
     return roleRepository.findAll();
+  }
+
+  @Override
+  @Transactional
+  public void updateUserInfo(User user, UpdateUserDTO update) {
+    Person person = user.getPerson();
+    person.setName(update.name());
+    person.setLastName(update.lastName());
+    if (!equalsText(user.getUsername(), update.email())) {
+      validateEmail(update.email());
+      person.setEmail(update.email());
+      user.setUsername(update.email());
+    }
+    person.setDocumentType(new IdentityDocument(update.documentTypeId()));
+    person.setPhone(update.phoneNumber());
+    userRepository.save(user);
+  }
+
+  @Override
+  public void updatePassword(User user, String newPassword) {
+    user.setPassword(encoder.encode(newPassword));
+    userRepository.save(user);
   }
 }

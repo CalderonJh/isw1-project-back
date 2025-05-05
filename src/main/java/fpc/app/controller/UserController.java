@@ -1,10 +1,17 @@
 package fpc.app.controller;
 
+import fpc.app.dto.app.UpdateUserDTO;
+import fpc.app.dto.app.UpdateUserPasswordDTO;
+import fpc.app.dto.app.UserDTO;
+import fpc.app.model.auth.User;
+import fpc.app.security.JwtUtil;
+import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -12,8 +19,47 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "User operations")
 public class UserController {
 
-  @GetMapping("/test")
-  public String test() {
-    return "You are authenticated";
+  private final UserService userService;
+  private final JwtUtil jwtUtil;
+
+  @PutMapping("/upate")
+  public ResponseEntity<Void> updateUserInf(
+      @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+      @RequestBody @Valid UpdateUserDTO update) {
+    String username = jwtUtil.extractEmail(token);
+    User user = userService.getByUsername(username);
+    userService.updateUserInfo(user, update);
+    return ResponseEntity.ok().build();
+  }
+
+  @GetMapping("/info")
+  public ResponseEntity<UserDTO> getUserInfo(
+      @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+    String username = jwtUtil.extractEmail(token);
+    User user = userService.getByUsername(username);
+    return ResponseEntity.ok(map(user));
+  }
+
+  @PutMapping("/update/password")
+  public ResponseEntity<Void> updatePassword(
+      @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+      @RequestBody UpdateUserPasswordDTO update) {
+    String username = jwtUtil.extractEmail(token);
+    User user = userService.getByUsername(username);
+    userService.updatePassword(user, update.password());
+    return ResponseEntity.ok().build();
+  }
+
+  private UserDTO map(User user) {
+    return UserDTO.builder()
+        .name(user.getPerson().getName())
+        .lastName(user.getPerson().getLastName())
+        .email(user.getUsername())
+        .documentTypeId(user.getPerson().getDocumentType().getId())
+        .documentNumber(user.getPerson().getDocumentNumber())
+        .gender(user.getPerson().getGender())
+        .birthDate(user.getPerson().getBirthday())
+        .phoneNumber(user.getPerson().getPhone())
+        .build();
   }
 }
