@@ -1,8 +1,8 @@
 package fpc.app.controller;
 
-import fpc.app.dto.app.UpdateUserDTO;
-import fpc.app.dto.app.UpdateUserPasswordDTO;
-import fpc.app.dto.app.UserDTO;
+import fpc.app.dto.user.UpdateUserDTO;
+import fpc.app.dto.user.UpdateUserPasswordDTO;
+import fpc.app.dto.user.UserDTO;
 import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
 import fpc.app.service.auth.UserService;
@@ -22,7 +22,7 @@ public class UserController {
   private final UserService userService;
   private final JwtUtil jwtUtil;
 
-  @PutMapping("/upate")
+  @PutMapping("/update")
   public ResponseEntity<Void> updateUserInf(
       @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestBody @Valid UpdateUserDTO update) {
@@ -43,7 +43,7 @@ public class UserController {
   @PutMapping("/update/password")
   public ResponseEntity<Void> updatePassword(
       @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-      @RequestBody UpdateUserPasswordDTO update) {
+      @RequestBody @Valid UpdateUserPasswordDTO update) {
     String username = jwtUtil.extractEmail(token);
     User user = userService.getByUsername(username);
     userService.updatePassword(user, update.password());

@@ -2,8 +2,8 @@ package fpc.app.service.auth.impl;
 
 import static fpc.app.util.Tools.*;
 
-import fpc.app.dto.app.UpdateUserDTO;
-import fpc.app.dto.app.UserDTO;
+import fpc.app.dto.user.UpdateUserDTO;
+import fpc.app.dto.user.UserDTO;
 import fpc.app.exception.ValidationException;
 import fpc.app.model.app.IdentityDocument;
 import fpc.app.model.app.Person;
@@ -103,13 +103,12 @@ public class UserServiceImpl implements UserService {
     Person person = user.getPerson();
     person.setName(update.name());
     person.setLastName(update.lastName());
+    person.setPhone(update.phoneNumber());
     if (!equalsText(user.getUsername(), update.email())) {
       validateEmail(update.email());
       person.setEmail(update.email());
       user.setUsername(update.email());
     }
-    person.setDocumentType(new IdentityDocument(update.documentTypeId()));
-    person.setPhone(update.phoneNumber());
     userRepository.save(user);
   }
 
