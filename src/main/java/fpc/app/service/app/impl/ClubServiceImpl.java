@@ -4,7 +4,7 @@ import static fpc.app.util.Tools.removeExtraSpaces;
 import static fpc.app.util.Tools.requireData;
 
 import fpc.app.dto.app.ClubDTO;
-import fpc.app.dto.app.ClubRequest;
+import fpc.app.dto.app.ClubCreateDTO;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.ClubAdmin;
 import fpc.app.model.auth.User;
@@ -53,7 +53,7 @@ public class ClubServiceImpl implements ClubService {
 
   @Override
   @Transactional
-  public void createClub(ClubRequest request, MultipartFile file) {
+  public void createClub(ClubCreateDTO request, MultipartFile file) {
     Club club = new Club();
     setClubInfo(request, file, club);
     clubRepository.save(club);
@@ -61,13 +61,13 @@ public class ClubServiceImpl implements ClubService {
 
   @Override
   @Transactional
-  public void update(Long clubId, ClubRequest request, MultipartFile file) {
+  public void update(Long clubId, ClubCreateDTO request, MultipartFile file) {
     Club club = requireData(this.getClub(clubId));
     setClubInfo(request, file, club);
     clubRepository.save(club);
   }
 
-  private void setClubInfo(ClubRequest request, MultipartFile file, Club club) {
+  private void setClubInfo(ClubCreateDTO request, MultipartFile file, Club club) {
     club.setName(removeExtraSpaces(request.name()).toUpperCase());
     club.setShortName(removeExtraSpaces(request.shortName()).toUpperCase());
     if (file != null) {

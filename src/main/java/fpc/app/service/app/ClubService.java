@@ -1,7 +1,7 @@
 package fpc.app.service.app;
 
 import fpc.app.dto.app.ClubDTO;
-import fpc.app.dto.app.ClubRequest;
+import fpc.app.dto.app.ClubCreateDTO;
 import fpc.app.model.app.Club;
 import jakarta.annotation.Nullable;
 import java.util.List;
@@ -16,9 +16,9 @@ public interface ClubService {
   @Nullable
   Club getClub(Long clubId);
 
-	void createClub(ClubRequest request, MultipartFile file);
+	void createClub(ClubCreateDTO request, MultipartFile file);
 
-	void update(Long clubId, ClubRequest request, MultipartFile file);
+	void update(Long clubId, ClubCreateDTO request, MultipartFile file);
 
   List<ClubDTO> list();
 }

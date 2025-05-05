@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "User registration data")
-public class RegisterUserRequest {
+public class UserDTO {
 
   @NotBlank
   @Size(min = 3, max = 250)

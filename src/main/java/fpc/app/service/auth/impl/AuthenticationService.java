@@ -2,7 +2,7 @@ package fpc.app.service.auth.impl;
 
 import static java.util.Objects.isNull;
 
-import fpc.app.dto.app.RegisterUserRequest;
+import fpc.app.dto.app.UserDTO;
 import fpc.app.model.app.IdentityDocument;
 import fpc.app.model.auth.User;
 import fpc.app.repository.app.IdentityDocumentRepository;
@@ -30,7 +30,7 @@ public class AuthenticationService {
     return jwtUtil.generateToken(user);
   }
 
-  public String register(@Valid RegisterUserRequest request) {
+  public String register(@Valid UserDTO request) {
     User user = userService.save(request);
     return jwtUtil.generateToken(user);
   }

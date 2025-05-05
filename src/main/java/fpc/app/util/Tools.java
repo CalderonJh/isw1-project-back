@@ -50,8 +50,8 @@ public class Tools {
     return str.replaceAll("\\s+", " ").trim();
   }
 
-  public static boolean equalsText(@NonNull String text1, @NonNull String text2) {
-    return removeExtraSpaces(text1).equalsIgnoreCase(removeExtraSpaces(text2));
+  public static boolean equalsText(@NonNull String t1, @NonNull String t2) {
+    return removeExtraSpaces(t1).equalsIgnoreCase(removeExtraSpaces(t2));
   }
 
   public static <E> E requireData(E entity) {
