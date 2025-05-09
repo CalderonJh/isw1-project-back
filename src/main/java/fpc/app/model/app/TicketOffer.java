@@ -3,9 +3,8 @@ package fpc.app.model.app;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import lombok.*;
-
-import java.util.Date;
 
 @Getter
 @Setter
@@ -29,13 +28,13 @@ public class TicketOffer {
 	@JoinColumn(name = "match_id")
 	private Match match;
 
-	@NotNull
-	@Column(name = "start_date", nullable = false)
-	private Date startDate;
+  @NotNull
+  @Column(name = "start_date", nullable = false)
+  private LocalDateTime startDate;
 
-	@NotNull
-	@Column(name = "end_date", nullable = false)
-	private Date endDate;
+  @NotNull
+  @Column(name = "end_date", nullable = false)
+  private LocalDateTime endDate;
 
 	@Nullable
 	@Column(name = "image_id")
