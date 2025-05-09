@@ -2,7 +2,6 @@ package fpc.app.security;
 
 import static fpc.app.constant.Constant.TOKEN_EXPIRATION_TIME;
 
-import fpc.app.model.auth.Role;
 import fpc.app.model.auth.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -28,7 +27,7 @@ public class JwtUtil {
   public String generateToken(User user) {
     return Jwts.builder()
         .subject(user.getUsername())
-        .claim("roles", user.getRoles().stream().map(Role::getName).toList())
+        .claim("roles", user.getRoles())
         .issuedAt(new Date())
         .expiration(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION_TIME))
         .signWith(getSigningKey())
@@ -64,6 +63,6 @@ public class JwtUtil {
   public List<String> extractRoles(String token) {
     Claims claims = extractAllClaims(token);
     List<?> rawRoles = (List<?>) claims.get("roles");
-    return rawRoles.stream().map(Object::toString).toList();
+    return rawRoles.stream().map(role -> ((Map<?, ?>) role).get("name").toString()).toList();
   }
 }

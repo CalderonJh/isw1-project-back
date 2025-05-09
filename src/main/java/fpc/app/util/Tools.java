@@ -2,15 +2,10 @@ package fpc.app.util;
 
 import fpc.app.dto.util.Suggestion;
 import fpc.app.exception.DataNotFoundException;
-import fpc.app.exception.ValidationException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-
-import static java.util.Objects.requireNonNull;
 
 @Slf4j
 public class Tools {
@@ -59,37 +54,17 @@ public class Tools {
     return removeExtraSpaces(t1).equalsIgnoreCase(removeExtraSpaces(t2));
   }
 
-  public static <T> T required(T o) {
-    return required(o, "Resource not found");
+  public static <E> E requireData(E entity) {
+    if (entity == null) {
+      throw new DataNotFoundException("Entity not found");
+    }
+    return entity;
   }
 
-  public static <T> T required(T o, String message) {
-    if (o == null) {
+  public static <E> E requireData(E entity, String message) {
+    if (entity == null) {
       throw new DataNotFoundException(message);
     }
-    return o;
-  }
-
-  public static LocalDateTime getColTime() {
-    return LocalDateTime.now(ZoneId.of("America/Bogota"));
-  }
-
-  public static void validateIsFutureDate(LocalDateTime date) {
-    if (date.isBefore(getColTime())) {
-      throw new ValidationException("Date must be in the future");
-    }
-  }
-
-  public static void validateDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-    if (startDate.isAfter(endDate)) {
-      throw new ValidationException("Start date must be before end date");
-    }
-  }
-
-  public static boolean isActive(@NonNull LocalDateTime startDate, LocalDateTime endDate) {
-    var time = getColTime();
-    if (startDate.isAfter(time)) return false;
-    if (endDate == null) return true;
-    return !endDate.isBefore(time);
+    return entity;
   }
 }

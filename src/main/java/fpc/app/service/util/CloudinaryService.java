@@ -18,10 +18,6 @@ public class CloudinaryService {
 
   public String uploadImage(MultipartFile file) {
     try {
-      if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
-        throw new TechnicalException("Invalid file type");
-      }
-
       Map<String, String> options = new HashMap<>();
       options.put("resource_type", "auto");
       return cloudinary.uploader().upload(file.getBytes(), options).get("public_id").toString();

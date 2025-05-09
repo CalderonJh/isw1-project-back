@@ -16,8 +16,5 @@ public interface StadiumService {
   @Nullable
   Stadium getStadium(String username, Long id);
 
-  @Nullable
-  Stadium getStadium(Long id);
-
   List<Stadium> getStadiums(String username);
 }
