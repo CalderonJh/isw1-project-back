@@ -1,7 +1,7 @@
 package fpc.app.service.app.impl;
 
 import static fpc.app.util.Tools.removeExtraSpaces;
-import static fpc.app.util.Tools.requireData;
+import static fpc.app.util.Tools.required;
 
 import fpc.app.dto.app.ClubDTO;
 import fpc.app.dto.app.ClubCreateDTO;
@@ -13,6 +13,7 @@ import fpc.app.repository.app.ClubRepository;
 import fpc.app.service.app.ClubService;
 import fpc.app.service.auth.UserService;
 import fpc.app.service.util.CloudinaryService;
+import fpc.app.util.Tools;
 import jakarta.annotation.Nullable;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -62,7 +63,7 @@ public class ClubServiceImpl implements ClubService {
   @Override
   @Transactional
   public void update(Long clubId, ClubCreateDTO request, MultipartFile file) {
-    Club club = requireData(this.getClub(clubId));
+    Club club = Tools.required(this.getClub(clubId));
     setClubInfo(request, file, club);
     clubRepository.save(club);
   }

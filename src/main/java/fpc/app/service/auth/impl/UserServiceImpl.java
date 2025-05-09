@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserDetails loadUser(String email) {
-    User user = requireData(getByUsername(email));
+    User user = required(getByUsername(email));
     return new org.springframework.security.core.userdetails.User(
         user.getUsername(), user.getPassword(), new ArrayList<>());
   }

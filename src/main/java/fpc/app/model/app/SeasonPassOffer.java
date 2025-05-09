@@ -5,9 +5,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import lombok.*;
 
 @Getter
 @Setter
@@ -46,4 +47,25 @@ public class SeasonPassOffer {
 	@Nullable
 	@Column(name = "image_id")
 	private String imageId;
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "season_pass_offer_match",
+      schema = "app",
+      joinColumns = @JoinColumn(name = "sp_offer_id"),
+      inverseJoinColumns = @JoinColumn(name = "match_id"))
+  private List<Match> matches = new ArrayList<>();
+
+  public void addMatch(Match match) {
+    if (matches == null) {
+      matches = new ArrayList<>();
+    }
+    matches.add(match);
+  }
+
+  public void removeMatch(Long matchId) {
+    if (matches != null) {
+      matches.removeIf(m -> m.getId().equals(matchId));
+    }
+  }
 }

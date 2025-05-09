@@ -75,7 +75,9 @@ public class StadiumController {
   private StadiumDTO mapStadiumDTO(Stadium stadium) {
     if (stadium == null) return null;
     return new StadiumDTO(
-        stadium.getName(), stadium.getStands().stream().map(this::mapStandDTO).toList());
+        stadium.getId(),
+        stadium.getName(),
+        stadium.getStands().stream().map(this::mapStandDTO).toList());
   }
 
   private StandDTO mapStandDTO(Stand stand) {

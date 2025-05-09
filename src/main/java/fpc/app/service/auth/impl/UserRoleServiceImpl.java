@@ -1,7 +1,7 @@
 package fpc.app.service.auth.impl;
 
 
-import static fpc.app.util.Tools.requireData;
+import static fpc.app.util.Tools.required;
 
 import fpc.app.constant.UserRole;
 import fpc.app.exception.DataNotFoundException;
@@ -34,7 +34,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     Role role = getRole(roleId);
     if (UserRole.CLUB_ADMIN.isSame(role)) {
       if (clubId == null) throw new ValidationException("Club id is required for club admin role");
-      Club club = requireData(clubService.getClub(clubId), "Club not found");
+      Club club = required(clubService.getClub(clubId), "Club not found");
       giveClubAdminRole(user, club);
       return;
     }
