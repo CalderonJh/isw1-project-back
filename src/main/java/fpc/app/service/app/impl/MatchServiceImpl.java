@@ -1,6 +1,6 @@
 package fpc.app.service.app.impl;
 
-import static fpc.app.util.Tools.requireData;
+import static fpc.app.util.Tools.required;
 import static java.util.Objects.requireNonNull;
 
 import fpc.app.dto.app.MatchDTO;
@@ -13,6 +13,7 @@ import fpc.app.service.app.ClubService;
 import fpc.app.service.app.MatchService;
 import fpc.app.service.app.StadiumService;
 import java.util.List;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -65,18 +66,20 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
-  public void update(String username, MatchDTO dto) {
-    Club club = clubService.getClubByAdmin(username);
-    Match match = requireData(getMatch(dto.matchId()));
+  public void update(Long matchId, MatchDTO dto) {
+    Match match = required(getMatch(dto.matchId()));
+    Club club = match.getHomeClub();
     if (dto.stadiumId().equals(match.getStadium().getId())) {
-      Stadium stadium = requireData(stadiumService.getStadium(username, dto.stadiumId()));
+      Stadium stadium = required(stadiumService.getStadium(dto.stadiumId()));
       validateStadium(stadium, club);
       match.setStadium(stadium);
     }
+    
     if (!dto.awayClubId().equals(match.getAwayClub().getId())) {
       validateAwayClub(club, dto.awayClubId());
       match.setAwayClub(clubService.getClub(dto.awayClubId()));
     }
+    
     match.setSeason(dto.season());
     match.setYear(dto.year());
     match.setStartDate(dto.matchDate());
@@ -84,8 +87,7 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
-  public List<Match> getMatches(String username) {
-    Club club = clubService.getClubByAdmin(username);
+  public List<Match> getMatches(@NonNull Club club) {
     return matchRepository.findByHomeClubId(club.getId());
   }
 

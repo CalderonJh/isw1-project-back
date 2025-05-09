@@ -1,0 +1,19 @@
+services:
+  app:
+    build: .
+    image: fpc-app
+    container_name: fpc-app
+    restart: always
+    ports:
+      - "80:8080"
+    environment:
+      POSTGRES_DB: fpc
+      POSTGRES_USER: su
+      POSTGRES_PASSWORD: securepass
+      SPRING_DATASOURCE_URL: jdbc:postgresql://fpc.c4ra8i8ye2np.us-east-1.rds.amazonaws.com:5432/fpc
+      SPRING_DATASOURCE_USERNAME: su
+      SPRING_DATASOURCE_PASSWORD: securepass
+      JWT_SECRET: holacomoestasbienyustedbientambienahbuenosiyquehacesnadaytunada
+      CLOUDINARY_CLOUD_NAME: djqsfvyae
+      CLOUDINARY_API_KEY: 852511488578879
+      CLOUDINARY_API_SECRET: JIgj5Bo8W3ROwqhPk2p0pxiOxoY
