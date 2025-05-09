@@ -114,7 +114,7 @@ CREATE TABLE app.match
     year         INTEGER                                 NOT NULL,
     season       INTEGER                                 NOT NULL,
     stadium_id   BIGINT                                  NOT NULL,
-    start_time   TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
+    start_time   TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_match PRIMARY KEY (id),
     CONSTRAINT FK_MATCH_ON_AWAY_TEAM FOREIGN KEY (away_team_id) REFERENCES app.club (id),
     CONSTRAINT FK_MATCH_ON_HOME_TEAM FOREIGN KEY (home_team_id) REFERENCES app.club (id),
@@ -220,4 +220,16 @@ CREATE TABLE app.season_pass_holder
     CONSTRAINT pk_season_pass_holder PRIMARY KEY (id),
     CONSTRAINT FK_SEASON_PASS_HOLDER_ON_SEASON_PASS_TYPE FOREIGN KEY (season_pass_type_id) REFERENCES app.season_pass_type (id),
     CONSTRAINT FK_SEASON_PASS_HOLDER_ON_USER FOREIGN KEY (user_id) REFERENCES app."user" (id)
+);
+
+create table app.season_pass_offer_match
+(
+    sp_offer_id integer not null
+        constraint table_name_season_pass_offer_id_fk
+            references app.season_pass_offer,
+    match_id    integer not null
+        constraint table_name_match_id_fk
+            references app.match,
+    constraint table_name_pk
+        primary key (sp_offer_id, match_id)
 );
