@@ -5,9 +5,12 @@ import static fpc.app.util.Tools.required;
 import fpc.app.dto.app.MatchDTO;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.Match;
+import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
+import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.ClubService;
 import fpc.app.service.app.MatchService;
+import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -27,12 +30,14 @@ public class MatchController {
   private final JwtUtil jwtUtil;
   private final MatchService matchService;
   private final ClubService clubService;
+  private final UserService userService;
+  private final ClubAdminService clubAdminService;
 
   @GetMapping("/all")
   public ResponseEntity<List<MatchDTO>> getAllMatches(
       @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-    String username = jwtUtil.extractEmail(token);
-    Club club = required(clubService.getClubByAdmin(username));
+    Long userId = jwtUtil.getUserId(token);
+    Club club = clubService.getClubByAdmin(userId);
     var matches = matchService.getMatches(club);
     return ResponseEntity.ok(matches.stream().map(this::toDTO).toList());
   }
@@ -42,9 +47,11 @@ public class MatchController {
   public ResponseEntity<Void> saveMatch(
       @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestBody @Valid MatchDTO matchDTO) {
-    String username = jwtUtil.extractEmail(token);
+    Long userId = jwtUtil.getUserId(token);
+    User user = required(userService.getUser(userId));
+    Club homeClub = clubAdminService.getClub(user);
 
-      matchService.create(username, matchDTO);
+    matchService.create(homeClub, matchDTO);
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
@@ -52,25 +59,15 @@ public class MatchController {
   @PreAuthorize("hasPermission(#matchId, 'Match', 'ANY')")
   @Operation(summary = "Update a match")
   public ResponseEntity<Void> updateMatch(
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-      @PathVariable Long matchId,
-      @RequestBody @Valid MatchDTO matchDTO) {
-    String username = jwtUtil.extractEmail(token);
-
-    if (matchDTO.matchId() == null) {
-      matchService.create(username, matchDTO);
-    } else {
-      matchService.update(matchId, matchDTO);
-    }
+      @PathVariable Long matchId, @RequestBody @Valid MatchDTO matchDTO) {
+    matchService.update(matchId, matchDTO);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @DeleteMapping("/delete/{id}")
   @PreAuthorize("hasPermission(#id, 'Match', 'ANY')")
-  public ResponseEntity<MatchDTO> removeMatch(
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable Long id) {
-    String username = jwtUtil.extractEmail(token);
-    matchService.deleteMatch(username, id);
+  public ResponseEntity<MatchDTO> removeMatch(@PathVariable Long id) {
+    matchService.deleteMatch(id);
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 

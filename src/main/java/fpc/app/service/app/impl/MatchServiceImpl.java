@@ -1,9 +1,9 @@
 package fpc.app.service.app.impl;
 
 import static fpc.app.util.Tools.required;
-import static java.util.Objects.requireNonNull;
 
 import fpc.app.dto.app.MatchDTO;
+import fpc.app.exception.DataNotFoundException;
 import fpc.app.exception.ValidationException;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.Match;
@@ -27,7 +27,9 @@ public class MatchServiceImpl implements MatchService {
 
   @Override
   public Match getMatch(Long id) {
-    return this.matchRepository.findById(id).orElse(null);
+    return this.matchRepository
+        .findById(id)
+        .orElseThrow(() -> new DataNotFoundException("Partido no encontrado"));
   }
 
   @Override
@@ -36,14 +38,12 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
-  public Match create(String username, MatchDTO dto) {
-    Club club = clubService.getClubByAdmin(username);
-    validateAwayClub(club, dto.awayClubId());
-    Stadium stadium = stadiumService.getStadium(username, dto.stadiumId());
-    validateStadium(requireNonNull(stadium), club);
+  public Match create(Club homeClub, MatchDTO dto) {
+    validateAwayClub(homeClub, dto.awayClubId());
+    Stadium stadium = stadiumService.getStadium(dto.stadiumId());
     Match toSave =
         Match.builder()
-            .homeClub(club)
+            .homeClub(homeClub)
             .awayClub(clubService.getClub(dto.awayClubId()))
             .year(dto.year())
             .season(dto.season())
@@ -51,12 +51,6 @@ public class MatchServiceImpl implements MatchService {
             .build();
 
     return matchRepository.save(toSave);
-  }
-
-  private void validateStadium(Stadium stadium, Club club) {
-    if (!stadium.getClub().getId().equals(club.getId())) {
-      throw new ValidationException("El estadio no pertenece al club");
-    }
   }
 
   private void validateAwayClub(Club club, Long awayTeamId) {
@@ -67,11 +61,10 @@ public class MatchServiceImpl implements MatchService {
 
   @Override
   public void update(Long matchId, MatchDTO dto) {
-    Match match = required(getMatch(dto.matchId()));
+    Match match = getMatch(dto.matchId());
     Club club = match.getHomeClub();
     if (dto.stadiumId().equals(match.getStadium().getId())) {
-      Stadium stadium = required(stadiumService.getStadium(dto.stadiumId()));
-      validateStadium(stadium, club);
+      Stadium stadium = stadiumService.getStadium(dto.stadiumId());
       match.setStadium(stadium);
     }
     
@@ -92,11 +85,7 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
-  public void deleteMatch(String username, Long id) {
-    Club club = clubService.getClubByAdmin(username);
-    Match match = matchRepository.findById(id).orElse(null);
-    if (match != null && match.getHomeClub().getId().equals(club.getId()))
-      matchRepository.delete(match);
-    else throw new ValidationException("No se puede eliminar el partido");
+  public void deleteMatch(Long id) {
+    matchRepository.deleteById(id);
   }
 }

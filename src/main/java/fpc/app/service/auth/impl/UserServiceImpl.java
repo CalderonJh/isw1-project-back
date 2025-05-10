@@ -4,11 +4,13 @@ import static fpc.app.util.Tools.*;
 
 import fpc.app.dto.user.UpdateUserDTO;
 import fpc.app.dto.user.UserDTO;
+import fpc.app.exception.DataNotFoundException;
 import fpc.app.exception.ValidationException;
 import fpc.app.model.app.IdentityDocument;
 import fpc.app.model.app.Person;
 import fpc.app.model.auth.Role;
 import fpc.app.model.auth.User;
+import fpc.app.repository.app.IdentityDocumentRepository;
 import fpc.app.repository.app.PersonRepository;
 import fpc.app.repository.auth.RoleRepository;
 import fpc.app.repository.auth.UserRepository;
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final PersonRepository personRepository;
   private final RoleRepository roleRepository;
+  private final IdentityDocumentRepository identityDocumentRepository;
 
   @Override
   @Transactional
@@ -76,15 +79,22 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDetails loadUser(String email) {
-    User user = required(getByUsername(email));
+  public UserDetails loadUser(Long userId) {
+    User user = required(getUser(userId), "User not found");
     return new org.springframework.security.core.userdetails.User(
-        user.getUsername(), user.getPassword(), new ArrayList<>());
+        user.getId().toString(), user.getPassword(), new ArrayList<>());
   }
 
   @Override
-  public @Nullable User getByUsername(String username) {
-    return userRepository.findByUsername(username).orElse(null);
+  public @Nullable User getUser(Long userID) {
+    return userRepository.findById(userID).orElse(null);
+  }
+
+  @Override
+  public User getUser(String username) {
+    return userRepository
+        .findByUsername(username)
+        .orElseThrow(() -> new DataNotFoundException("User not found with given username"));
   }
 
   @Override
@@ -116,5 +126,10 @@ public class UserServiceImpl implements UserService {
   public void updatePassword(User user, String newPassword) {
     user.setPassword(encoder.encode(newPassword));
     userRepository.save(user);
+  }
+
+  @Override
+  public List<IdentityDocument> getIdentityDocumentTypes() {
+    return identityDocumentRepository.findAll();
   }
 }

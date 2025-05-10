@@ -1,12 +1,12 @@
 package fpc.app.component;
 
-import fpc.app.model.app.Club;
-import fpc.app.model.app.ClubAdmin;
-import fpc.app.model.app.Match;
-import fpc.app.model.app.TicketOffer;
+import static java.lang.Long.parseLong;
+
+import fpc.app.model.app.*;
 import fpc.app.repository.TicketOfferRepository;
 import fpc.app.repository.app.ClubAdminRepository;
 import fpc.app.repository.app.MatchRepository;
+import fpc.app.repository.app.StadiumRepository;
 import java.io.Serializable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
@@ -18,6 +18,7 @@ public class ClubPermissionEvaluator implements PermissionEvaluator {
   private ClubAdminRepository clubAdminRepository;
   private TicketOfferRepository ticketOfferRepository;
   private MatchRepository matchRepository;
+  private StadiumRepository stadiumRepository;
 
   @Override
   public boolean hasPermission(
@@ -26,8 +27,8 @@ public class ClubPermissionEvaluator implements PermissionEvaluator {
       return false;
     }
 
-    String username = authentication.getName();
-    ClubAdmin admin = clubAdminRepository.findByUser(username).orElse(null);
+    Long userId = parseLong(authentication.getName());
+    ClubAdmin admin = clubAdminRepository.findByUser(userId).orElse(null);
 
     if (admin == null) {
       return false;
@@ -52,8 +53,8 @@ public class ClubPermissionEvaluator implements PermissionEvaluator {
       return false;
     }
 
-    String username = authentication.getName();
-    ClubAdmin admin = clubAdminRepository.findByUser(username).orElse(null);
+    Long userId = parseLong(authentication.getName());
+    ClubAdmin admin = clubAdminRepository.findByUser(userId).orElse(null);
 
     if (admin == null) {
       return false;
@@ -63,8 +64,9 @@ public class ClubPermissionEvaluator implements PermissionEvaluator {
 
     Long recordId = Long.valueOf(targetId.toString());
     return switch (targetType) {
-      case "Match" -> clubId.equals(matchRepository.getHomeClubId(recordId));
       case "Club" -> clubId.equals(recordId);
+      case "Match" -> clubId.equals(matchRepository.getHomeClubId(recordId));
+      case "Stadium" -> clubId.equals(stadiumRepository.getClubId(recordId));
       case "TicketOffer" -> clubId.equals(ticketOfferRepository.getClubId(recordId));
       default -> false;
     };
@@ -83,5 +85,10 @@ public class ClubPermissionEvaluator implements PermissionEvaluator {
   @Autowired
   public void setTicketOfferRepository(TicketOfferRepository ticketOfferRepository) {
     this.ticketOfferRepository = ticketOfferRepository;
+  }
+
+  @Autowired
+  public void setStadiumRepository(StadiumRepository stadiumRepository) {
+    this.stadiumRepository = stadiumRepository;
   }
 }

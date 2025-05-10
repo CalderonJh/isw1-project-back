@@ -5,20 +5,13 @@ import static fpc.app.util.Tools.*;
 import fpc.app.dto.app.StadiumDTO;
 import fpc.app.dto.app.StandDTO;
 import fpc.app.exception.DataNotFoundException;
-import fpc.app.exception.ValidationException;
 import fpc.app.model.app.Club;
-import fpc.app.model.app.ClubAdmin;
 import fpc.app.model.app.Stadium;
 import fpc.app.model.app.Stand;
-import fpc.app.model.auth.User;
-import fpc.app.repository.app.ClubAdminRepository;
 import fpc.app.repository.app.StadiumRepository;
 import fpc.app.service.app.ClubService;
 import fpc.app.service.app.StadiumService;
-import fpc.app.service.auth.UserService;
 import fpc.app.service.util.CloudinaryService;
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,24 +21,18 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class StadiumServiceImpl implements StadiumService {
-  private final UserService userService;
-  private final ClubAdminRepository clubAdminRepository;
   private final StadiumRepository stadiumRepository;
   private final CloudinaryService cloudinaryService;
   private final ClubService clubService;
 
   @Override
   @Transactional
-  public void createStadium(String username, StadiumDTO dto, MultipartFile image) {
-    User user = required(userService.getByUsername(username));
-    ClubAdmin clubAdmin =
-        clubAdminRepository
-            .findByUserId(user.getId())
-            .orElseThrow(() -> new DataNotFoundException("User is not a club admin"));
-    validateStadiumName(dto.name(), clubAdmin.getClub());
-    Stadium stadium = Stadium.builder().name(dto.name()).club(clubAdmin.getClub()).build();
+  public void createStadium(Club club, StadiumDTO dto, MultipartFile image) {
+    validateStadiumName(dto.name(), club);
+    Stadium stadium = Stadium.builder().name(dto.name()).club(club).build();
     addStands(stadium, dto.stands());
-    saveImage(stadium, image);
+    String imageId = saveImage(image);
+    stadium.setImageId(imageId);
     stadiumRepository.save(stadium);
   }
 
@@ -54,9 +41,8 @@ public class StadiumServiceImpl implements StadiumService {
       throw new DataNotFoundException("Ya existe un estadio con ese nombre para este club");
   }
 
-  private void saveImage(Stadium stadium, MultipartFile image) {
-    String imageId = cloudinaryService.uploadImage(image);
-    stadium.setImageId(imageId);
+  private String saveImage(MultipartFile image) {
+    return cloudinaryService.uploadImage(image);
   }
 
   private void addStands(Stadium stadium, List<StandDTO> stands) {
@@ -64,9 +50,8 @@ public class StadiumServiceImpl implements StadiumService {
   }
 
   @Override
-  public void updateStadium(String username, Long stadiumId, StadiumDTO dto) {
-    Stadium stadium = required(getStadium(username, stadiumId));
-    validateStadiumAccess(username, stadium.getClub());
+  public void updateStadium(Long stadiumId, StadiumDTO dto) {
+    Stadium stadium = getStadium(stadiumId);
     String name = removeExtraSpaces(dto.name());
     if (!equalsText(stadium.getName(), name)) validateStadiumName(dto.name(), stadium.getClub());
     stadium.setName(name);
@@ -75,36 +60,22 @@ public class StadiumServiceImpl implements StadiumService {
     stadiumRepository.save(stadium);
   }
 
-  private void validateStadiumAccess(String username, @NotNull Club club) {
-    User user = userService.getByUsername(username);
-    if (!clubAdminRepository.existsByUserIdAndClubId(user.getId(), club.getId()))
-      throw new ValidationException("No access to this stadium");
-  }
-
   @Override
-  public void deleteStadium(String username, Long id) {
-    Stadium stadium = required(getStadium(username, id));
-    validateStadiumAccess(username, stadium.getClub());
+  public void deleteStadium(Long id) {
+    Stadium stadium = getStadium(id);
     stadiumRepository.delete(stadium);
   }
 
-  @Nullable
-  @Override
-  public Stadium getStadium(String username, Long id) {
-    Stadium stadium = stadiumRepository.findById(id).orElseThrow();
-    validateStadiumAccess(username, stadium.getClub());
-    return stadium;
-  }
-
-  @Nullable
   @Override
   public Stadium getStadium(Long id) {
-    return stadiumRepository.findById(id).orElse(null);
+    return stadiumRepository
+        .findById(id)
+        .orElseThrow(() -> new DataNotFoundException("Estadio no encontrado"));
   }
 
   @Override
-  public List<Stadium> getStadiums(String username) {
-    Club club = clubService.getClubByAdmin(username);
+  public List<Stadium> getStadiums(Long clubId) {
+    Club club = clubService.getClub(clubId);
     return stadiumRepository.findByClubId(club.getId());
   }
 }

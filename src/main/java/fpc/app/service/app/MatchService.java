@@ -10,11 +10,11 @@ public interface MatchService {
 
   Match save(Match match);
 
-  Match create(String clubAdminUsername, MatchDTO match);
+  Match create(Club homeClub, MatchDTO match);
 
   void update(Long matchId, MatchDTO dto);
 
   List<Match> getMatches(Club club);
 
-  void deleteMatch(String username, Long id);
+  void deleteMatch(Long id);
 }

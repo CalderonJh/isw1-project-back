@@ -10,7 +10,8 @@ import fpc.app.model.app.Match;
 import fpc.app.model.app.TicketOffer;
 import fpc.app.model.auth.User;
 import fpc.app.repository.TicketOfferRepository;
-import fpc.app.repository.app.ClubAdminRepository;
+import fpc.app.service.app.ClubAdminService;
+import fpc.app.service.app.ClubService;
 import fpc.app.service.app.MatchService;
 import fpc.app.service.app.TicketService;
 import fpc.app.service.util.CloudinaryService;
@@ -23,17 +24,18 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class TicketServiceImpl implements TicketService {
-  private final ClubAdminRepository clubAdminRepository;
   private final TicketOfferRepository ticketOfferRepository;
   private final MatchService matchService;
   private final CloudinaryService cloudinaryService;
+  private final ClubService clubService;
+  private final ClubAdminService clubAdminService;
 
   @Override
   public void createTicketOffer() {}
 
   @Override
   public void createTicketOffer(User creator, CreateTicketOfferDTO dto, MultipartFile file) {
-    ClubAdmin clubAdmin = getClubAdmin(creator);
+    ClubAdmin clubAdmin = clubAdminService.getClubAdmin(creator);
     String imageId = cloudinaryService.uploadImage(file);
     Match match = matchService.getMatch(dto.matchId());
     validateIsFutureDate(match.getStartDate().minusHours(1));
@@ -69,10 +71,6 @@ public class TicketServiceImpl implements TicketService {
 
   public TicketOffer save(TicketOffer ticketOffer) {
     return ticketOfferRepository.save(ticketOffer);
-  }
-
-  private ClubAdmin getClubAdmin(User user) {
-    return null;
   }
 
   public void changeTicketOfferStatus(Long ticketOfferId, OfferStatus status) {

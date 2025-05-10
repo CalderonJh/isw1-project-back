@@ -2,6 +2,7 @@ package fpc.app.service.auth.impl;
 
 
 import static fpc.app.util.Tools.required;
+import static java.util.Objects.isNull;
 
 import fpc.app.constant.UserRole;
 import fpc.app.exception.DataNotFoundException;
@@ -10,13 +11,12 @@ import fpc.app.model.app.Club;
 import fpc.app.model.app.ClubAdmin;
 import fpc.app.model.auth.Role;
 import fpc.app.model.auth.User;
-import fpc.app.repository.app.ClubAdminRepository;
 import fpc.app.repository.auth.RoleRepository;
 import fpc.app.repository.auth.UserRepository;
+import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.ClubService;
 import fpc.app.service.auth.UserRoleService;
 import java.util.Date;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +25,8 @@ import org.springframework.stereotype.Service;
 public class UserRoleServiceImpl implements UserRoleService {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
-  private final ClubAdminRepository clubAdminRepository;
   private final ClubService clubService;
+  private final ClubAdminService clubAdminService;
 
   @Override
   public void giveRole(Long userId, Long roleId, Long clubId) {
@@ -34,7 +34,7 @@ public class UserRoleServiceImpl implements UserRoleService {
     Role role = getRole(roleId);
     if (UserRole.CLUB_ADMIN.isSame(role)) {
       if (clubId == null) throw new ValidationException("Club id is required for club admin role");
-      Club club = required(clubService.getClub(clubId), "Club not found");
+      Club club = clubService.getClub(clubId);
       giveClubAdminRole(user, club);
       return;
     }
@@ -43,27 +43,24 @@ public class UserRoleServiceImpl implements UserRoleService {
   }
 
   private void giveClubAdminRole(User user, Club club) {
-    Optional<ClubAdmin> optional = clubAdminRepository.findByUserId(user.getId());
-    if (optional.isEmpty()) {
-      clubAdminRepository.save(
+    ClubAdmin admin = clubAdminService.getClubAdmin(user);
+    if (isNull(admin)) {
+      clubAdminService.save(
           ClubAdmin.builder().user(user).club(club).startDate(new Date()).endDate(null).build());
       user.getRoles().add(getRole(UserRole.CLUB_ADMIN));
       userRepository.save(user);
       return;
     }
-    if (!optional.get().getClub().getId().equals(club.getId()))
+    if (!admin.getClub().getId().equals(club.getId()))
       throw new ValidationException(
           "User already has a club admin role for another club, please revoke it first");
   }
 
   private void revokeClubAdminRole(Long userId) {
     User user = getUser(userId);
-    ClubAdmin clubAdmin =
-        clubAdminRepository
-            .findByUserId(user.getId())
-            .orElseThrow(() -> new ValidationException("User is not a club admin"));
+    ClubAdmin clubAdmin = clubAdminService.getClubAdmin(user);
     clubAdmin.setEndDate(new Date());
-    clubAdminRepository.save(clubAdmin);
+    clubAdminService.save(clubAdmin);
     user.getRoles().remove(getRole(UserRole.USER));
     userRepository.save(user);
   }

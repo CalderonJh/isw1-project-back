@@ -1,19 +1,21 @@
 package fpc.app.service.app;
 
-import fpc.app.dto.app.ClubDTO;
 import fpc.app.dto.app.ClubCreateDTO;
+import fpc.app.dto.app.ClubDTO;
 import fpc.app.model.app.Club;
-import jakarta.annotation.Nullable;
+import fpc.app.model.auth.User;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ClubService {
 
-  Club getClubByAdmin(String username);
+  Club getClubByAdmin(Long userId);
+
+
+	Club getClubByAdmin(User user);
 
   void save(Club club);
 
-  @Nullable
   Club getClub(Long clubId);
 
 	void createClub(ClubCreateDTO request, MultipartFile file);

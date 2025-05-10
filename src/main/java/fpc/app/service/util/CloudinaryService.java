@@ -1,5 +1,7 @@
 package fpc.app.service.util;
 
+import static java.util.Objects.requireNonNull;
+
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
 import fpc.app.exception.TechnicalException;
@@ -18,9 +20,8 @@ public class CloudinaryService {
 
   public String uploadImage(MultipartFile file) {
     try {
-      if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+      if (!requireNonNull(file.getContentType()).startsWith("image/"))
         throw new TechnicalException("Invalid file type");
-      }
 
       Map<String, String> options = new HashMap<>();
       options.put("resource_type", "auto");

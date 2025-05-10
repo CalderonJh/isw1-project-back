@@ -1,8 +1,7 @@
 package fpc.app.config;
 
-import java.util.List;
-
 import fpc.app.security.JwtRequestFilter;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,7 +58,11 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
-                        "/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/bus/v3/api-docs/**")
+                        "/auth/**",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/bus/v3/api-docs/**",
+                        "/pub/**")
                     .permitAll()
                     .requestMatchers("/club-admin/**")
                     .hasRole("CLUB_ADMIN")

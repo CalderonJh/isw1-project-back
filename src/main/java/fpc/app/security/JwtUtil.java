@@ -9,7 +9,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +26,7 @@ public class JwtUtil {
 
   public String generateToken(User user) {
     return Jwts.builder()
-        .subject(user.getUsername())
+        .subject(user.getId().toString())
         .claim("roles", user.getRoles().stream().map(Role::getName).toList())
         .issuedAt(new Date())
         .expiration(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION_TIME))
@@ -36,10 +35,14 @@ public class JwtUtil {
   }
 
   // extracts the email from the token
-  public String extractEmail(String token) {
+  public Long getUserId(String token) {
     final String authPrefix = "Bearer ";
     if (token.startsWith(authPrefix)) token = token.substring(authPrefix.length());
-    return extractClaim(token, Claims::getSubject);
+    try {
+      return Long.parseLong(extractClaim(token, Claims::getSubject));
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Could not parse user ID from token");
+    }
   }
 
   public <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
@@ -52,9 +55,9 @@ public class JwtUtil {
   }
 
   // checks if the token is valid
-  public boolean isTokenValid(String token, String userEmail) {
-    final String extractedEmail = extractEmail(token);
-    return extractedEmail.equals(userEmail) && !isTokenExpired(token);
+  public boolean isTokenValid(String token, Long userId) {
+    final Long tokenUserID = getUserId(token);
+    return tokenUserID.equals(userId) && !isTokenExpired(token);
   }
 
   public boolean isTokenExpired(String token) {

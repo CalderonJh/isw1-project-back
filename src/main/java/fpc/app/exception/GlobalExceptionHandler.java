@@ -21,12 +21,15 @@ import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 @Hidden
 public class GlobalExceptionHandler {
+  private static final String DEFAULT_ERROR_MESSAGE = "Ocurrió un error inesperado";
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorDetails> handleGlobalException(Exception ex, WebRequest request) {
+    log.error("No handled exception: {}", ex.getMessage());
     ErrorDetails errorDetails =
         ErrorDetails.builder()
             .timestamp(LocalDateTime.now())
-            .message(ex.getMessage())
+            .message(DEFAULT_ERROR_MESSAGE)
             .details(request.getDescription(false))
             .build();
     return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -35,55 +38,64 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({DataNotFoundException.class})
   public ResponseEntity<ErrorDetails> handleResourceNotFoundException(
       DataNotFoundException ex, WebRequest request) {
+    log.error("Object or resource not found: {}", ex.getMessage());
     ErrorDetails errorDetails =
-        new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        new ErrorDetails(
+            LocalDateTime.now(), "No se encontró el recurso", request.getDescription(false));
     return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler({TechnicalException.class})
-  public ResponseEntity<ErrorDetails> handleTechnicalException(
-      TechnicalException ex, WebRequest request) {
+  public ResponseEntity<ErrorDetails> handleTechnicalException(TechnicalException ex) {
     log.error("Technical exception: {}", ex.toString());
     ErrorDetails errorDetails =
-        new ErrorDetails(LocalDateTime.now(), "Internal Error", request.getDescription(false));
-    return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+        new ErrorDetails(LocalDateTime.now(), DEFAULT_ERROR_MESSAGE, "Error técnico");
+    return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ExceptionHandler({NoSuchElementException.class})
-  public ResponseEntity<ErrorDetails> handleNoSuchElementException(
-      NoSuchElementException ex, WebRequest request) {
+  public ResponseEntity<ErrorDetails> handleNoSuchElementException(NoSuchElementException ex) {
+    log.error("Invalid object access: {}", ex.getMessage());
     ErrorDetails errorDetails =
-        new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
-    return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+        new ErrorDetails(LocalDateTime.now(), DEFAULT_ERROR_MESSAGE, "Error interno");
+    return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ExceptionHandler({NullPointerException.class})
   public ResponseEntity<ErrorDetails> handleNullPointerException(
       NullPointerException ex, WebRequest request) {
+    log.error("Null pointer: {}", ex.getMessage());
     ErrorDetails errorDetails =
-        new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
-    return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+        new ErrorDetails(LocalDateTime.now(), DEFAULT_ERROR_MESSAGE, request.getDescription(false));
+    return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ExceptionHandler({ValidationException.class})
-  public ResponseEntity<ErrorDetails> handleValidationException(
-      ValidationException ex, WebRequest request) {
+  public ResponseEntity<ErrorDetails> handleValidationException(ValidationException ex) {
+    log.error("Validation error: {}", ex.getMessage());
     ErrorDetails errorDetails =
-        new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        new ErrorDetails(
+            LocalDateTime.now(),
+            "No se puede procesar la solicitud",
+            "No se cumple alguna validación interna");
     return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
   }
 
   @ExceptionHandler({BadCredentialsException.class})
-  public ResponseEntity<ErrorDetails> handleBadCredentialsException(
-      BadCredentialsException ex, WebRequest request) {
+  public ResponseEntity<ErrorDetails> handleBadCredentialsException(BadCredentialsException ex) {
+    log.error("Bad credentials: {}", ex.getMessage());
     ErrorDetails errorDetails =
-        new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        new ErrorDetails(
+            LocalDateTime.now(),
+            "Usuario o contraseña incorrectos",
+            "La combinación de usuario y contraseña no es válida");
     return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
   }
 
   @ExceptionHandler({MethodArgumentNotValidException.class})
   public ResponseEntity<InputDataError> handleMethodArgumentNotValidException(
-      MethodArgumentNotValidException ex, WebRequest request) {
+      MethodArgumentNotValidException ex) {
+    log.error("Method argument not valid: {}", ex.getMessage());
     Map<String, String> errors = new HashMap<>();
     ex.getBindingResult()
         .getFieldErrors()
@@ -92,8 +104,8 @@ public class GlobalExceptionHandler {
     InputDataError inputDataError =
         InputDataError.builder()
             .timestamp(LocalDateTime.now())
-            .message("Error: Input data validation failed")
-            .details(request.getDescription(false))
+            .message(DEFAULT_ERROR_MESSAGE)
+            .details("La petición no cumple con las validaciones")
             .errors(errors)
             .build();
 
@@ -103,6 +115,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(ConstraintViolationException.class)
   public ResponseEntity<InputDataError> handleConstraintViolationException(
       ConstraintViolationException ex) {
+    log.error("Bad request: {}", ex.getMessage());
     Map<String, String> errors = new HashMap<>();
 
     for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
@@ -113,8 +126,8 @@ public class GlobalExceptionHandler {
 
     InputDataError errorResponse = new InputDataError();
     errorResponse.setTimestamp(LocalDateTime.now());
-    errorResponse.setMessage("IO validation failed");
-    errorResponse.setDetails("The request contains invalid fields");
+    errorResponse.setMessage(DEFAULT_ERROR_MESSAGE);
+    errorResponse.setDetails("La petición contiene campos no válidos");
     errorResponse.setErrors(errors);
 
     return ResponseEntity.badRequest().body(errorResponse);
@@ -123,8 +136,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(AccessDeniedException.class)
   public ResponseEntity<ErrorDetails> handleAccessDenied(
       AccessDeniedException ex, WebRequest request) {
+    log.error("Access denied: {}", ex.getMessage());
+
     ErrorDetails errorDetails =
-        new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        new ErrorDetails(LocalDateTime.now(), DEFAULT_ERROR_MESSAGE, "Acceso denegado");
     return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
   }
 }

@@ -26,8 +26,8 @@ public class UserController {
   public ResponseEntity<Void> updateUserInf(
       @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestBody @Valid UpdateUserDTO update) {
-    String username = jwtUtil.extractEmail(token);
-    User user = userService.getByUsername(username);
+    Long userId = jwtUtil.getUserId(token);
+    User user = userService.getUser(userId);
     userService.updateUserInfo(user, update);
     return ResponseEntity.ok().build();
   }
@@ -35,8 +35,8 @@ public class UserController {
   @GetMapping("/info")
   public ResponseEntity<UserDTO> getUserInfo(
       @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-    String username = jwtUtil.extractEmail(token);
-    User user = userService.getByUsername(username);
+    Long userId = jwtUtil.getUserId(token);
+    User user = userService.getUser(userId);
     return ResponseEntity.ok(map(user));
   }
 
@@ -44,8 +44,8 @@ public class UserController {
   public ResponseEntity<Void> updatePassword(
       @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestBody @Valid UpdateUserPasswordDTO update) {
-    String username = jwtUtil.extractEmail(token);
-    User user = userService.getByUsername(username);
+    Long userId = jwtUtil.getUserId(token);
+    User user = userService.getUser(userId);
     userService.updatePassword(user, update.password());
     return ResponseEntity.ok().build();
   }

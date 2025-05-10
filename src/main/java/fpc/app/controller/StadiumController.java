@@ -2,10 +2,14 @@ package fpc.app.controller;
 
 import fpc.app.dto.app.StadiumDTO;
 import fpc.app.dto.app.StandDTO;
+import fpc.app.model.app.Club;
 import fpc.app.model.app.Stadium;
 import fpc.app.model.app.Stand;
+import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
+import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.StadiumService;
+import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -13,6 +17,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class StadiumController {
   private final StadiumService stadiumService;
   private final JwtUtil jwtUtil;
+  private final UserService userService;
+  private final ClubAdminService clubAdminService;
 
   @PostMapping("/create")
   @Operation(summary = "Create a new stadium")
@@ -30,45 +37,42 @@ public class StadiumController {
       @RequestPart("stadium") @Valid StadiumDTO request,
       @RequestPart("image") MultipartFile image,
       @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-    String username = jwtUtil.extractEmail(token);
-    stadiumService.createStadium(username, request, image);
+    Long userId = jwtUtil.getUserId(token);
+    User creator = userService.getUser(userId);
+    Club club = clubAdminService.getClub(creator);
+    stadiumService.createStadium(club, request, image);
     return ResponseEntity.ok().build();
   }
 
   @PutMapping("/update/{id}")
+  @PreAuthorize("hasPermission(#id, 'Stadium', 'ANY')")
   public ResponseEntity<Void> updateStadium(
-      @PathVariable Long id,
-      @RequestPart("stadium") @Valid StadiumDTO request,
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-    String username = jwtUtil.extractEmail(token);
-    stadiumService.updateStadium(username, id, request);
+      @PathVariable Long id, @RequestPart("stadium") @Valid StadiumDTO request) {
+    stadiumService.updateStadium(id, request);
     return ResponseEntity.ok().build();
   }
 
   @GetMapping("/all")
   @Operation(summary = "Get all stadiums")
-  public ResponseEntity<List<StadiumDTO>> getAllStadiums(
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-    String username = jwtUtil.extractEmail(token);
-    List<Stadium> stadiums = stadiumService.getStadiums(username);
+  @PreAuthorize("hasPermission(#clubId, 'Club', 'ANY')")
+  public ResponseEntity<List<StadiumDTO>> getAllStadiums(@RequestParam Long clubId) {
+    List<Stadium> stadiums = stadiumService.getStadiums(clubId);
     return ResponseEntity.ok(stadiums.stream().map(this::mapStadiumDTO).toList());
   }
 
   @GetMapping("/{id}")
   @Operation(summary = "Get a stadium")
-  public ResponseEntity<StadiumDTO> getStadium(
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable Long id) {
-    String username = jwtUtil.extractEmail(token);
-    Stadium stadium = stadiumService.getStadium(username, id);
+  @PreAuthorize("hasPermission(#id, 'Stadium', 'ANY')")
+  public ResponseEntity<StadiumDTO> getStadium(@PathVariable Long id) {
+    Stadium stadium = stadiumService.getStadium(id);
     return ResponseEntity.ok(mapStadiumDTO(stadium));
   }
 
   @DeleteMapping("/delete/{id}")
   @Operation(summary = "Delete a stadium")
-  public ResponseEntity<Void> deleteStadium(
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String token, @PathVariable Long id) {
-    String username = jwtUtil.extractEmail(token);
-    stadiumService.deleteStadium(username, id);
+  @PreAuthorize("hasPermission(#id, 'Stadium', 'ANY')")
+  public ResponseEntity<Void> deleteStadium(@PathVariable Long id) {
+    stadiumService.deleteStadium(id);
     return ResponseEntity.ok().build();
   }
 

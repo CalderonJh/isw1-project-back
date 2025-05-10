@@ -54,6 +54,7 @@ public class SeasonPassOffer {
       schema = "app",
       joinColumns = @JoinColumn(name = "sp_offer_id"),
       inverseJoinColumns = @JoinColumn(name = "match_id"))
+	@Builder.Default
   private List<Match> matches = new ArrayList<>();
 
   public void addMatch(Match match) {

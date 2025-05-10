@@ -1,49 +1,49 @@
 package fpc.app.service.app.impl;
 
 import static fpc.app.util.Tools.removeExtraSpaces;
-import static fpc.app.util.Tools.required;
 
-import fpc.app.dto.app.ClubDTO;
 import fpc.app.dto.app.ClubCreateDTO;
+import fpc.app.dto.app.ClubDTO;
+import fpc.app.exception.DataNotFoundException;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.ClubAdmin;
 import fpc.app.model.auth.User;
-import fpc.app.repository.app.ClubAdminRepository;
 import fpc.app.repository.app.ClubRepository;
+import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.ClubService;
 import fpc.app.service.auth.UserService;
 import fpc.app.service.util.CloudinaryService;
-import fpc.app.util.Tools;
-import jakarta.annotation.Nullable;
+
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@RequiredArgsConstructor
 public class ClubServiceImpl implements ClubService {
   private final ClubRepository clubRepository;
   private final CloudinaryService cloudinaryService;
   private final UserService userService;
-  private final ClubAdminRepository clubAdminRepository;
-
-  public ClubServiceImpl(ClubRepository clubRepository, CloudinaryService cloudinaryService, UserService userService, ClubAdminRepository clubAdminRepository) {
-    this.clubRepository = clubRepository;
-    this.cloudinaryService = cloudinaryService;
-    this.userService = userService;
-    this.clubAdminRepository = clubAdminRepository;
-  }
+  private final ClubAdminService clubAdminService;
 
   @Override
-  @Nullable
   public Club getClub(Long clubId) {
-    return clubRepository.findById(clubId).orElse(null);
+    return clubRepository
+        .findById(clubId)
+        .orElseThrow(() -> new DataNotFoundException("Club no encontrado"));
   }
 
   @Override
-  public Club getClubByAdmin(String username) {
-    User user = userService.getByUsername(username);
-    ClubAdmin clubAdmin = clubAdminRepository.findByUserId(user.getId()).orElseThrow();
+  public Club getClubByAdmin(Long userId) {
+    User user = userService.getUser(userId);
+    return getClubByAdmin(user);
+  }
+
+  @Override
+  public Club getClubByAdmin(User user) {
+    ClubAdmin clubAdmin = clubAdminService.getClubAdmin(user);
     return clubAdmin.getClub();
   }
 
@@ -63,7 +63,7 @@ public class ClubServiceImpl implements ClubService {
   @Override
   @Transactional
   public void update(Long clubId, ClubCreateDTO request, MultipartFile file) {
-    Club club = Tools.required(this.getClub(clubId));
+    Club club = this.getClub(clubId);
     setClubInfo(request, file, club);
     clubRepository.save(club);
   }

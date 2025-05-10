@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -28,21 +29,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
 
     final String authHeader = request.getHeader("Authorization");
-    String username = null;
+    Long userId = null;
     String jwt = null;
 
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
       jwt = authHeader.substring(7);
       try {
-        username = jwtUtil.extractEmail(jwt);
+        userId = jwtUtil.getUserId(jwt);
       } catch (Exception e) {
         logger.warn("Invalid JWT token");
       }
     }
 
-    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-      var userDetails = userService.loadUser(username);
-      if (jwtUtil.isTokenValid(jwt, userDetails.getUsername())) {
+    if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+      UserDetails userDetails = userService.loadUser(userId);
+      if (jwtUtil.isTokenValid(jwt, Long.parseLong(userDetails.getUsername()))) {
         List<String> roles = jwtUtil.extractRoles(jwt);
         List<SimpleGrantedAuthority> authorities =
             roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).toList();
