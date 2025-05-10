@@ -1,6 +1,6 @@
 package fpc.app.component;
 
-import fpc.app.repository.TicketOfferRepository;
+import fpc.app.repository.app.TicketOfferRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

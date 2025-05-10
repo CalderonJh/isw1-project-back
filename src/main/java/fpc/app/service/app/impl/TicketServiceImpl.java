@@ -9,7 +9,7 @@ import fpc.app.model.app.ClubAdmin;
 import fpc.app.model.app.Match;
 import fpc.app.model.app.TicketOffer;
 import fpc.app.model.auth.User;
-import fpc.app.repository.TicketOfferRepository;
+import fpc.app.repository.app.TicketOfferRepository;
 import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.ClubService;
 import fpc.app.service.app.MatchService;

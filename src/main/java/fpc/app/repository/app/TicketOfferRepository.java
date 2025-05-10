@@ -1,4 +1,4 @@
-package fpc.app.repository;
+package fpc.app.repository.app;
 
 import fpc.app.model.app.TicketOffer;
 import org.springframework.data.jpa.repository.JpaRepository;
