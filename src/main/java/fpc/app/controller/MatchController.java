@@ -12,6 +12,7 @@ import fpc.app.service.app.ClubService;
 import fpc.app.service.app.MatchService;
 import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -35,7 +36,7 @@ public class MatchController {
 
   @GetMapping("/all")
   public ResponseEntity<List<MatchDTO>> getAllMatches(
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
     Long userId = jwtUtil.getUserId(token);
     Club club = clubService.getClubByAdmin(userId);
     var matches = matchService.getMatches(club);
@@ -45,7 +46,7 @@ public class MatchController {
   @PostMapping("/save")
   @Operation(summary = "Create or update a match")
   public ResponseEntity<Void> saveMatch(
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestBody @Valid MatchDTO matchDTO) {
     Long userId = jwtUtil.getUserId(token);
     User user = required(userService.getUser(userId));

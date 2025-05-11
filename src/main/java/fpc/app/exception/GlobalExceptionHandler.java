@@ -24,13 +24,13 @@ public class GlobalExceptionHandler {
   private static final String DEFAULT_ERROR_MESSAGE = "Ocurrió un error inesperado";
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorDetails> handleGlobalException(Exception ex, WebRequest request) {
+  public ResponseEntity<ErrorDetails> handleGlobalException(Exception ex) {
     log.error("No handled exception: {}", ex.getMessage());
     ErrorDetails errorDetails =
         ErrorDetails.builder()
             .timestamp(LocalDateTime.now())
             .message(DEFAULT_ERROR_MESSAGE)
-            .details(request.getDescription(false))
+            .details(ex.getMessage())
             .build();
     return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
   }
@@ -134,8 +134,7 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(AccessDeniedException.class)
-  public ResponseEntity<ErrorDetails> handleAccessDenied(
-      AccessDeniedException ex, WebRequest request) {
+  public ResponseEntity<ErrorDetails> handleAccessDenied(AccessDeniedException ex) {
     log.error("Access denied: {}", ex.getMessage());
 
     ErrorDetails errorDetails =

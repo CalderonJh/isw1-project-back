@@ -11,6 +11,7 @@ import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.StadiumService;
 import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -36,7 +37,7 @@ public class StadiumController {
   public ResponseEntity<Void> createStadium(
       @RequestPart("stadium") @Valid StadiumDTO request,
       @RequestPart("image") MultipartFile image,
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
     Long userId = jwtUtil.getUserId(token);
     User creator = userService.getUser(userId);
     Club club = clubAdminService.getClub(creator);
