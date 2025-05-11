@@ -14,7 +14,8 @@ public class StadiumMapper {
     return new StadiumDTO(
         stadium.getId(),
         stadium.getName(),
-        stadium.getStands().stream().map(StadiumMapper::mapStand).toList());
+        stadium.getStands().stream().map(StadiumMapper::mapStand).toList(),
+        stadium.getImageId());
   }
 
   public static List<StadiumDTO> map(List<Stadium> stadiums) {
