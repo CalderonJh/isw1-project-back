@@ -6,6 +6,7 @@ import fpc.app.dto.user.UserDTO;
 import fpc.app.service.auth.impl.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name = "Registration and authentication")
+@SecurityRequirement(name = "")
 public class AuthController {
   private final AuthenticationService authService;
 

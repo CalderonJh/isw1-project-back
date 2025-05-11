@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,9 @@ public class AdminTicketController {
   private final UserService userService;
   private final JwtUtil jwtUtil;
 
-  @PostMapping("/create")
+  @PostMapping(
+      value = "/create",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @PreAuthorize("hasPermission(#matchId, 'Match', 'ANY')")
   public ResponseEntity<Void> createTicketOffer(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
