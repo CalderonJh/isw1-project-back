@@ -3,9 +3,13 @@ package fpc.app.controller;
 import fpc.app.dto.user.UpdateUserDTO;
 import fpc.app.dto.user.UpdateUserPasswordDTO;
 import fpc.app.dto.user.UserDTO;
+import fpc.app.model.app.Club;
 import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
+import fpc.app.service.app.ClubService;
+import fpc.app.service.app.SubscriptionService;
 import fpc.app.service.auth.UserService;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +25,12 @@ public class UserController {
 
   private final UserService userService;
   private final JwtUtil jwtUtil;
+  private final ClubService clubService;
+  private final SubscriptionService subscriptionService;
 
   @PutMapping("/update")
   public ResponseEntity<Void> updateUserInf(
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestBody @Valid UpdateUserDTO update) {
     Long userId = jwtUtil.getUserId(token);
     User user = userService.getUser(userId);
@@ -34,7 +40,7 @@ public class UserController {
 
   @GetMapping("/info")
   public ResponseEntity<UserDTO> getUserInfo(
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
     Long userId = jwtUtil.getUserId(token);
     User user = userService.getUser(userId);
     return ResponseEntity.ok(map(user));
@@ -42,11 +48,22 @@ public class UserController {
 
   @PutMapping("/update/password")
   public ResponseEntity<Void> updatePassword(
-      @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestBody @Valid UpdateUserPasswordDTO update) {
     Long userId = jwtUtil.getUserId(token);
     User user = userService.getUser(userId);
     userService.updatePassword(user, update.password());
+    return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/subscribe")
+  @Parameter(name = "clubId", description = "Club ID")
+  public ResponseEntity<Void> subscribeToClub(
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+      @RequestParam Long clubId) {
+    User user = userService.getUser(jwtUtil.getUserId(token));
+    Club club = clubService.getClub(clubId);
+    subscriptionService.subscribe(user, club);
     return ResponseEntity.ok().build();
   }
 

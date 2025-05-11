@@ -23,4 +23,5 @@ public interface ClubService {
 	void update(Long clubId, ClubCreateDTO request, MultipartFile file);
 
   List<ClubDTO> list();
+
 }

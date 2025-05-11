@@ -13,7 +13,6 @@ import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.ClubService;
 import fpc.app.service.auth.UserService;
 import fpc.app.service.util.CloudinaryService;
-
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
