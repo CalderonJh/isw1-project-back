@@ -15,5 +15,5 @@ public interface StadiumService {
 
   Stadium getStadium(Long id);
 
-  List<Stadium> getStadiums(Long clubId);
+  List<Stadium> getStadiums(Club club);
 }

@@ -10,5 +10,5 @@ public interface ClubAdminService {
 
   ClubAdmin save(ClubAdmin clubAdmin);
 
-  Club getClub(User creator);
+  Club getClub(User admin);
 }

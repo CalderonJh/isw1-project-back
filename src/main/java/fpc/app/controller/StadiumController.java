@@ -57,9 +57,11 @@ public class StadiumController {
 
   @GetMapping("/all")
   @Operation(summary = "Get all stadiums")
-  @PreAuthorize("hasPermission(#clubId, 'Club', 'ANY')")
-  public ResponseEntity<List<StadiumDTO>> getAllStadiums(@RequestParam Long clubId) {
-    List<Stadium> stadiums = stadiumService.getStadiums(clubId);
+  public ResponseEntity<List<StadiumDTO>> getAllStadiums(
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+    Long userId = jwtUtil.getUserId(token);
+    Club club = clubAdminService.getClub(new User(userId));
+    List<Stadium> stadiums = stadiumService.getStadiums(club);
     return ResponseEntity.ok(StadiumMapper.map(stadiums));
   }
 

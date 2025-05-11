@@ -236,3 +236,6 @@ create table app.season_pass_offer_match
 
 alter table app.ticket_offer
     add paused boolean default false;
+alter table app.club_admin
+    add constraint club_admin_pk
+        unique (user_id, club_id);
