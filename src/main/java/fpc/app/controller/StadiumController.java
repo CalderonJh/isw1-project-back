@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,9 @@ public class StadiumController {
   private final UserService userService;
   private final ClubAdminService clubAdminService;
 
-  @PostMapping("/create")
+  @PostMapping(
+      value = "/create",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Operation(summary = "Create a new stadium")
   public ResponseEntity<Void> createStadium(
       @RequestPart("stadium") @Valid StadiumDTO request,
@@ -47,7 +50,7 @@ public class StadiumController {
   @PutMapping("/update/{id}")
   @PreAuthorize("hasPermission(#id, 'Stadium', 'ANY')")
   public ResponseEntity<Void> updateStadium(
-      @PathVariable Long id, @RequestPart("stadium") @Valid StadiumDTO request) {
+      @PathVariable Long id, @RequestBody @Valid StadiumDTO request) {
     stadiumService.updateStadium(id, request);
     return ResponseEntity.ok().build();
   }

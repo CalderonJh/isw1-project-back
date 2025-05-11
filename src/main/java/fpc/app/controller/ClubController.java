@@ -7,10 +7,10 @@ import fpc.app.model.app.Club;
 import fpc.app.service.app.ClubService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ClubController {
   private final ClubService clubService;
 
-  @PostMapping("/create")
+  @Operation(summary = "Crear un club con imagen")
+  @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<Void> create(
       @RequestPart(value = "image", required = false) MultipartFile file,
       @RequestPart("club") @Valid ClubCreateDTO request) {
@@ -30,7 +31,9 @@ public class ClubController {
     return ResponseEntity.ok().build();
   }
 
-  @PutMapping("/update/{clubId}")
+  @PutMapping(
+      value = "/update/{clubId}",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<Void> update(
       @PathVariable Long clubId,
       @RequestPart(value = "file", required = false) MultipartFile file,

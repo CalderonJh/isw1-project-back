@@ -9,6 +9,7 @@ import fpc.app.service.app.ClubService;
 import fpc.app.service.auth.UserService;
 import fpc.app.util.Tools;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/pub")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "")
 @Tag(name = "Public endpoints")
 public class PublicController {
 	private final UserService userService;
