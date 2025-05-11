@@ -9,7 +9,6 @@ import fpc.app.model.app.Club;
 import fpc.app.model.app.Stadium;
 import fpc.app.model.app.Stand;
 import fpc.app.repository.app.StadiumRepository;
-import fpc.app.service.app.ClubService;
 import fpc.app.service.app.StadiumService;
 import fpc.app.service.util.CloudinaryService;
 import java.util.List;
@@ -23,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class StadiumServiceImpl implements StadiumService {
   private final StadiumRepository stadiumRepository;
   private final CloudinaryService cloudinaryService;
-  private final ClubService clubService;
 
   @Override
   @Transactional
@@ -74,8 +72,7 @@ public class StadiumServiceImpl implements StadiumService {
   }
 
   @Override
-  public List<Stadium> getStadiums(Long clubId) {
-    Club club = clubService.getClub(clubId);
+  public List<Stadium> getStadiums(Club club) {
     return stadiumRepository.findByClubId(club.getId());
   }
 }
