@@ -1,7 +1,6 @@
 package fpc.app.service.app;
 
 import fpc.app.dto.app.ClubCreateDTO;
-import fpc.app.dto.app.ClubDTO;
 import fpc.app.model.app.Club;
 import fpc.app.model.auth.User;
 import java.util.List;
@@ -22,6 +21,5 @@ public interface ClubService {
 
 	void update(Long clubId, ClubCreateDTO request, MultipartFile file);
 
-  List<ClubDTO> list();
-
+  List<Club> list();
 }

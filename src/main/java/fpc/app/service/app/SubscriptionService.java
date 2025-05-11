@@ -11,6 +11,8 @@ public interface SubscriptionService {
 
   List<Club> getSubscriptions(User user);
 
+  List<Long> getSubscriptionsIds(User user);
+
   void unsubscribe(User user, Club club);
 
 }

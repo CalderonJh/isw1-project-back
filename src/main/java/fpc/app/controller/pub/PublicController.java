@@ -2,6 +2,8 @@ package fpc.app.controller.pub;
 
 import fpc.app.dto.app.ClubDTO;
 import fpc.app.dto.util.Suggestion;
+import fpc.app.mapper.ClubMapper;
+import fpc.app.model.app.Club;
 import fpc.app.model.app.IdentityDocument;
 import fpc.app.service.app.ClubService;
 import fpc.app.service.auth.UserService;
@@ -33,7 +35,7 @@ public class PublicController {
   @GetMapping("/club/list")
   @Operation(summary = "List all clubs")
   public ResponseEntity<List<ClubDTO>> list() {
-    List<ClubDTO> clubs = clubService.list();
-    return ResponseEntity.ok(clubs);
+    List<Club> clubs = clubService.list();
+    return ResponseEntity.ok(ClubMapper.map(clubs));
   }
 }

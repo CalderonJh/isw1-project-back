@@ -2,10 +2,14 @@ package fpc.app.controller;
 
 import fpc.app.dto.app.ClubCreateDTO;
 import fpc.app.dto.app.ClubDTO;
+import fpc.app.mapper.ClubMapper;
+import fpc.app.model.app.Club;
 import fpc.app.service.app.ClubService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +25,7 @@ public class ClubController {
   @PostMapping("/create")
   public ResponseEntity<Void> create(
       @RequestPart(value = "image", required = false) MultipartFile file,
-      @RequestPart("club") ClubCreateDTO request) {
+      @RequestPart("club") @Valid ClubCreateDTO request) {
     clubService.createClub(request, file);
     return ResponseEntity.ok().build();
   }
@@ -30,7 +34,7 @@ public class ClubController {
   public ResponseEntity<Void> update(
       @PathVariable Long clubId,
       @RequestPart(value = "file", required = false) MultipartFile file,
-      @RequestPart("club") ClubCreateDTO request) {
+      @RequestPart("club") @Valid ClubCreateDTO request) {
     clubService.update(clubId, request, file);
     return ResponseEntity.ok().build();
   }
@@ -38,7 +42,7 @@ public class ClubController {
   @GetMapping("/list")
   @Operation(summary = "List all clubs")
   public ResponseEntity<List<ClubDTO>> list() {
-    List<ClubDTO> clubs = clubService.list();
-    return ResponseEntity.ok(clubs);
+    List<Club> clubs = clubService.list();
+    return ResponseEntity.ok(ClubMapper.map(clubs));
   }
 }

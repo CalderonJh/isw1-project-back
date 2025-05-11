@@ -233,3 +233,6 @@ create table app.season_pass_offer_match
     constraint table_name_pk
         primary key (sp_offer_id, match_id)
 );
+
+alter table app.ticket_offer
+    add paused boolean default false;

@@ -18,10 +18,10 @@ public class TicketOffer {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotNull
-	@ManyToOne
-	@JoinColumn(name = "posted_by", nullable = false)
-	private ClubAdmin postedBy;
+  @NotNull
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "posted_by", nullable = false)
+  private ClubAdmin publisher;
 
 	@NotNull
 	@ManyToOne
@@ -39,4 +39,7 @@ public class TicketOffer {
 	@Nullable
 	@Column(name = "image_id")
 	private String imageId;
+
+  @Column(name = "paused")
+  private boolean paused;
 }

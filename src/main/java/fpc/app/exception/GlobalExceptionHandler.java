@@ -36,12 +36,10 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler({DataNotFoundException.class})
-  public ResponseEntity<ErrorDetails> handleResourceNotFoundException(
-      DataNotFoundException ex, WebRequest request) {
+  public ResponseEntity<ErrorDetails> handleResourceNotFoundException(DataNotFoundException ex) {
     log.error("Object or resource not found: {}", ex.getMessage());
     ErrorDetails errorDetails =
-        new ErrorDetails(
-            LocalDateTime.now(), "No se encontró el recurso", request.getDescription(false));
+        new ErrorDetails(LocalDateTime.now(), "No se enc ontró el recurso", ex.getMessage());
     return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
   }
 
@@ -74,10 +72,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorDetails> handleValidationException(ValidationException ex) {
     log.error("Validation error: {}", ex.getMessage());
     ErrorDetails errorDetails =
-        new ErrorDetails(
-            LocalDateTime.now(),
-            "No se puede procesar la solicitud",
-            "No se cumple alguna validación interna");
+        new ErrorDetails(LocalDateTime.now(), "No se puede procesar la solicitud", ex.getMessage());
     return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
   }
 
