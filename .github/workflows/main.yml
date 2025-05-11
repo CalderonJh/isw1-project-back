@@ -26,5 +26,6 @@ jobs:
             cd /home/ec2-user/project/isw1-project-back
             git pull origin main
             docker-compose -f ../docker-compose.yml down
+            docker rmi -f $(docker images -aq) || true
             docker-compose -f ../docker-compose.yml up -d --build
           EOF
