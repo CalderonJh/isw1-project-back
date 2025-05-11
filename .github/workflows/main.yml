@@ -22,7 +22,7 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh -i ~/.ssh/id_rsa ec2-user@ec2-100-26-187-163.compute-1.amazonaws.com << 'EOF'
+          ssh -i ~/.ssh/id_rsa ec2-user@ec2-100-26-187-163.compute-1.amazonaws.com << EOF
             set -e
             cd /home/ec2-user/project/isw1-project-back
             git pull origin main
