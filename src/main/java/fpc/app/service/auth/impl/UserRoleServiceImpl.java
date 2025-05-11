@@ -1,7 +1,5 @@
 package fpc.app.service.auth.impl;
 
-
-import static fpc.app.util.Tools.required;
 import static java.util.Objects.isNull;
 
 import fpc.app.constant.UserRole;
@@ -87,7 +85,7 @@ public class UserRoleServiceImpl implements UserRoleService {
   private Role getRole(UserRole role) {
     return roleRepository
         .findByNameIgnoreCase(role.toString())
-        .orElseThrow(() -> new DataNotFoundException("Role not found with given id"));
+        .orElseThrow(() -> new DataNotFoundException("Role not found with given name"));
   }
 
   private User getUser(Long userId) {

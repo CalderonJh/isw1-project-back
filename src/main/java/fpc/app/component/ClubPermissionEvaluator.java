@@ -3,7 +3,7 @@ package fpc.app.component;
 import static java.lang.Long.parseLong;
 
 import fpc.app.model.app.*;
-import fpc.app.repository.TicketOfferRepository;
+import fpc.app.repository.app.TicketOfferRepository;
 import fpc.app.repository.app.ClubAdminRepository;
 import fpc.app.repository.app.MatchRepository;
 import fpc.app.repository.app.StadiumRepository;
