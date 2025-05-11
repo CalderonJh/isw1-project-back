@@ -11,6 +11,9 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
   @Query("SELECT s.club FROM Subscription s WHERE s.user.id = :userId")
   List<Club> getClubsByUserId(Long userId);
 
+  @Query("SELECT s.club.id FROM Subscription s WHERE s.user.id = :userId")
+  List<Long> getClubsIdsByUserId(Long userId);
+
   @Query("SELECT s.user FROM Subscription s WHERE s.club.id = :clubId")
   List<User> getUsersByClub(Long clubId);
 

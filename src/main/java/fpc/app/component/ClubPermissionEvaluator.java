@@ -39,7 +39,7 @@ public class ClubPermissionEvaluator implements PermissionEvaluator {
     // Verificar según el tipo de objeto
     return switch (targetDomainObject) {
       case Club club -> adminClubId.equals((club).getId());
-      case TicketOffer offer -> adminClubId.equals((offer).getPostedBy().getClub().getId());
+      case TicketOffer offer -> adminClubId.equals((offer).getPublisher().getClub().getId());
       case Match match -> adminClubId.equals((match.getHomeClub().getId()));
       default -> false;
     };

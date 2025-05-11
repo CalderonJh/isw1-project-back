@@ -3,6 +3,7 @@ package fpc.app.controller;
 import fpc.app.dto.user.UpdateUserDTO;
 import fpc.app.dto.user.UpdateUserPasswordDTO;
 import fpc.app.dto.user.UserDTO;
+import fpc.app.mapper.UserMapper;
 import fpc.app.model.app.Club;
 import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
@@ -43,7 +44,7 @@ public class UserController {
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
     Long userId = jwtUtil.getUserId(token);
     User user = userService.getUser(userId);
-    return ResponseEntity.ok(map(user));
+    return ResponseEntity.ok(UserMapper.map(user));
   }
 
   @PutMapping("/update/password")
@@ -65,18 +66,5 @@ public class UserController {
     Club club = clubService.getClub(clubId);
     subscriptionService.subscribe(user, club);
     return ResponseEntity.ok().build();
-  }
-
-  private UserDTO map(User user) {
-    return UserDTO.builder()
-        .name(user.getPerson().getName())
-        .lastName(user.getPerson().getLastName())
-        .email(user.getUsername())
-        .documentTypeId(user.getPerson().getDocumentType().getId())
-        .documentNumber(user.getPerson().getDocumentNumber())
-        .gender(user.getPerson().getGender())
-        .birthDate(user.getPerson().getBirthday())
-        .phoneNumber(user.getPerson().getPhone())
-        .build();
   }
 }

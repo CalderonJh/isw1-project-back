@@ -11,12 +11,12 @@ import fpc.app.model.app.TicketOffer;
 import fpc.app.model.auth.User;
 import fpc.app.repository.app.TicketOfferRepository;
 import fpc.app.service.app.ClubAdminService;
-import fpc.app.service.app.ClubService;
 import fpc.app.service.app.MatchService;
 import fpc.app.service.app.TicketService;
 import fpc.app.service.util.CloudinaryService;
 import jakarta.annotation.Nullable;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,34 +27,37 @@ public class TicketServiceImpl implements TicketService {
   private final TicketOfferRepository ticketOfferRepository;
   private final MatchService matchService;
   private final CloudinaryService cloudinaryService;
-  private final ClubService clubService;
   private final ClubAdminService clubAdminService;
 
   @Override
-  public void createTicketOffer() {}
-
-  @Override
-  public void createTicketOffer(User creator, CreateTicketOfferDTO dto, MultipartFile file) {
+  public void createTicketOffer(
+      User creator, Long matchId, CreateTicketOfferDTO dto, MultipartFile file) {
     ClubAdmin clubAdmin = clubAdminService.getClubAdmin(creator);
     String imageId = cloudinaryService.uploadImage(file);
-    Match match = matchService.getMatch(dto.matchId());
-    validateIsFutureDate(match.getStartDate().minusHours(1));
+    Match match = matchService.getMatch(matchId);
+    validateMatchDate(match);
     LocalDateTime saleStartDate = validateSaleStartDate(dto.saleStartDate(), match);
     LocalDateTime saleEndDate = validateSaleEndDate(saleStartDate, dto.saleEndDate(), match);
     save(
         TicketOffer.builder()
             .match(match)
-            .postedBy(clubAdmin)
+            .publisher(clubAdmin)
             .startDate(saleStartDate)
             .endDate(saleEndDate)
             .imageId(imageId)
             .build());
   }
 
+  private void validateMatchDate(Match match) {
+    if (match.getStartDate() == null)
+      throw new ValidationException("No se ha definido la fecha del partido");
+    validateIsFutureDate(match.getStartDate());
+  }
+
   private LocalDateTime validateSaleStartDate(LocalDateTime startDate, Match match) {
     if (startDate == null) return getColTime();
     validateIsFutureDate(startDate);
-    if (!startDate.isBefore(match.getStartDate())) {
+    if (!startDate.isBefore(match.getStartDate().minusHours(1))) {
       throw new ValidationException(
           "La fecha de inicio de venta debe ser al menos una hora antes del inicio del partido");
     }
@@ -82,11 +85,19 @@ public class TicketServiceImpl implements TicketService {
     }
   }
 
-  private void disableTicketOffer(TicketOffer offer) {}
+  private void disableTicketOffer(TicketOffer offer) {
+    offer.setEndDate(getColTime());
+    save(offer);
+  }
 
   private void enableTickeOffer(TicketOffer offer) {}
 
   public @Nullable TicketOffer get(Long ticketOfferId) {
     return ticketOfferRepository.findById(ticketOfferId).orElse(null);
+  }
+
+  @Override
+  public List<TicketOffer> getOffers(List<Long> clubIds) {
+    return ticketOfferRepository.getOffersByClubIdIn(clubIds);
   }
 }

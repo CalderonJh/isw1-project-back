@@ -1,10 +1,9 @@
 package fpc.app.controller;
 
 import fpc.app.dto.app.StadiumDTO;
-import fpc.app.dto.app.StandDTO;
+import fpc.app.mapper.StadiumMapper;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.Stadium;
-import fpc.app.model.app.Stand;
 import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
 import fpc.app.service.app.ClubAdminService;
@@ -58,7 +57,7 @@ public class StadiumController {
   @PreAuthorize("hasPermission(#clubId, 'Club', 'ANY')")
   public ResponseEntity<List<StadiumDTO>> getAllStadiums(@RequestParam Long clubId) {
     List<Stadium> stadiums = stadiumService.getStadiums(clubId);
-    return ResponseEntity.ok(stadiums.stream().map(this::mapStadiumDTO).toList());
+    return ResponseEntity.ok(StadiumMapper.map(stadiums));
   }
 
   @GetMapping("/{id}")
@@ -66,7 +65,7 @@ public class StadiumController {
   @PreAuthorize("hasPermission(#id, 'Stadium', 'ANY')")
   public ResponseEntity<StadiumDTO> getStadium(@PathVariable Long id) {
     Stadium stadium = stadiumService.getStadium(id);
-    return ResponseEntity.ok(mapStadiumDTO(stadium));
+    return ResponseEntity.ok(StadiumMapper.map(stadium));
   }
 
   @DeleteMapping("/delete/{id}")
@@ -75,17 +74,5 @@ public class StadiumController {
   public ResponseEntity<Void> deleteStadium(@PathVariable Long id) {
     stadiumService.deleteStadium(id);
     return ResponseEntity.ok().build();
-  }
-
-  private StadiumDTO mapStadiumDTO(Stadium stadium) {
-    if (stadium == null) return null;
-    return new StadiumDTO(
-        stadium.getId(),
-        stadium.getName(),
-        stadium.getStands().stream().map(this::mapStandDTO).toList());
-  }
-
-  private StandDTO mapStandDTO(Stand stand) {
-    return new StandDTO(stand.getName(), stand.getCapacity());
   }
 }

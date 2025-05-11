@@ -3,7 +3,6 @@ package fpc.app.service.app.impl;
 import static fpc.app.util.Tools.removeExtraSpaces;
 
 import fpc.app.dto.app.ClubCreateDTO;
-import fpc.app.dto.app.ClubDTO;
 import fpc.app.exception.DataNotFoundException;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.ClubAdmin;
@@ -78,16 +77,7 @@ public class ClubServiceImpl implements ClubService {
   }
 
   @Override
-  public List<ClubDTO> list() {
-    return clubRepository.findAll().stream().map(ClubServiceImpl::map).toList();
-  }
-
-  private static ClubDTO map(Club club) {
-    return ClubDTO.builder()
-        .id(club.getId())
-        .name(club.getName())
-        .shortName(club.getShortName())
-        .imageId(club.getImageId())
-        .build();
+  public List<Club> list() {
+    return clubRepository.findAll();
   }
 }

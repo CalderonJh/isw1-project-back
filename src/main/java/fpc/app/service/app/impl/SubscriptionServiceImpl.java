@@ -30,6 +30,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
   }
 
   @Override
+  public List<Long> getSubscriptionsIds(User user) {
+    return subscriptionRepository.getClubsIdsByUserId(user.getId());
+  }
+
+  @Override
   public void unsubscribe(User user, Club club) {
     subscriptionRepository.deleteByUserIdAndClubId(user.getId(), club.getId());
   }
