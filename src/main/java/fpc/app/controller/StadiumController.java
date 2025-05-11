@@ -55,6 +55,15 @@ public class StadiumController {
     return ResponseEntity.ok().build();
   }
 
+  @PutMapping("/update/{id}/image")
+  @PreAuthorize("hasPermission(#id, 'Stadium', 'ANY')")
+  @Operation(summary = "Update stadium image")
+  public ResponseEntity<Void> updateStadiumImage(
+      @PathVariable Long id, @RequestPart("image") MultipartFile image) {
+    stadiumService.updateStadiumImage(id, image);
+    return ResponseEntity.ok().build();
+  }
+
   @GetMapping("/all")
   @Operation(summary = "Get all stadiums")
   public ResponseEntity<List<StadiumDTO>> getAllStadiums(

@@ -12,6 +12,7 @@ import fpc.app.repository.app.StadiumRepository;
 import fpc.app.service.app.StadiumService;
 import fpc.app.service.util.CloudinaryService;
 import java.util.List;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,7 @@ public class StadiumServiceImpl implements StadiumService {
   }
 
   @Override
+  @Transactional
   public void updateStadium(Long stadiumId, StadiumDTO dto) {
     Stadium stadium = getStadium(stadiumId);
     String name = removeExtraSpaces(dto.name());
@@ -55,6 +57,16 @@ public class StadiumServiceImpl implements StadiumService {
     stadium.setName(name);
     stadium.clearStands();
     addStands(stadium, dto.stands());
+    stadiumRepository.save(stadium);
+  }
+
+  @Override
+  @Transactional
+  public void updateStadiumImage(Long id, @NonNull MultipartFile image) {
+    Stadium stadium = getStadium(id);
+    if (stadium.getImageId() != null) cloudinaryService.deleteImage(stadium.getImageId());
+    String imageId = cloudinaryService.uploadImage(image);
+    stadium.setImageId(imageId);
     stadiumRepository.save(stadium);
   }
 
