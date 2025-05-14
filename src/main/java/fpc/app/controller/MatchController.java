@@ -3,8 +3,8 @@ package fpc.app.controller;
 import static fpc.app.util.Tools.hasText;
 
 import fpc.app.constant.MatchSearchType;
-import fpc.app.dto.response.ClubResponseDTO;
 import fpc.app.dto.request.MatchCreationDTO;
+import fpc.app.dto.response.ClubResponseDTO;
 import fpc.app.dto.response.MatchResponseDTO;
 import fpc.app.mapper.ClubMapper;
 import fpc.app.mapper.MatchMapper;
@@ -39,7 +39,11 @@ public class MatchController {
   private final ClubAdminService clubAdminService;
 
   @GetMapping("/all")
-  @Parameter(name = "type", description = "T for Ticket, S for Season Pass")
+  @Parameter(
+      name = "searchType",
+      description =
+          "Used to get only valid matches for ticket or season pass offers creation <br> T: Ticket offer <br> S: Season pass offer")
+  @Operation(summary = "List matches")
   public ResponseEntity<List<MatchResponseDTO>> getAllMatches(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestParam String searchType) {
@@ -52,7 +56,7 @@ public class MatchController {
   }
 
   @GetMapping("/clubs")
-  @Operation(summary = "List available clubs for match creation")
+  @Operation(summary = "List available clubs for match creation, that is all except the current club")
   public ResponseEntity<List<ClubResponseDTO>> list(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
     User user = userService.getUser(jwtUtil.getUserId(token));
@@ -62,7 +66,7 @@ public class MatchController {
   }
 
   @PostMapping("/save")
-  @Operation(summary = "Create or update a match")
+  @Operation(summary = "Create a match")
   public ResponseEntity<Void> saveMatch(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestBody @Valid MatchCreationDTO matchCreationDTO) {
@@ -85,6 +89,7 @@ public class MatchController {
 
   @DeleteMapping("/delete/{id}")
   @PreAuthorize("hasPermission(#id, 'Match', 'ANY')")
+  @Operation(summary = "Delete a match")
   public ResponseEntity<MatchCreationDTO> removeMatch(@PathVariable Long id) {
     matchService.deleteMatch(id);
     return ResponseEntity.status(HttpStatus.OK).build();

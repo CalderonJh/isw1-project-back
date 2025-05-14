@@ -49,6 +49,7 @@ public class StadiumController {
 
   @PutMapping("/update/{id}")
   @PreAuthorize("hasPermission(#id, 'Stadium', 'ANY')")
+  @Operation(summary = "Update stadium details")
   public ResponseEntity<Void> updateStadium(
       @PathVariable Long id, @RequestBody @Valid StadiumDTO request) {
     stadiumService.updateStadium(id, request);
@@ -65,7 +66,7 @@ public class StadiumController {
   }
 
   @GetMapping("/all")
-  @Operation(summary = "Get all stadiums")
+  @Operation(summary = "Get all stadiums of the current club")
   public ResponseEntity<List<StadiumDTO>> getAllStadiums(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
     Long userId = jwtUtil.getUserId(token);

@@ -22,17 +22,17 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
   private final AuthenticationService authService;
 
-  @Operation(summary = "Use credentials to generate token")
   @PostMapping("/login")
+  @Operation(summary = "Use credentials to generate token")
   public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest loginRequest) {
     String token = authService.login(loginRequest.username(), loginRequest.password());
     return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, token).build();
   }
 
-  @Operation(summary = "Register a new user and generate token")
+  @PostMapping("/register")
   @ApiResponse(responseCode = "200", description = "User registered successfully")
   @ApiResponse(responseCode = "409", description = "If validation fails")
-  @PostMapping("/register")
+  @Operation(summary = "Register a new user and generate token")
   public ResponseEntity<Void> register(@RequestBody @Valid UserDTO request) {
     String token = authService.register(request);
     return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, token).build();

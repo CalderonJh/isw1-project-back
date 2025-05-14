@@ -22,8 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ClubController {
   private final ClubService clubService;
 
-  @Operation(summary = "Crear un club con imagen")
   @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @Operation(summary = "Create a club with logo")
   public ResponseEntity<Void> create(
       @RequestPart(value = "image", required = false) MultipartFile file,
       @RequestPart("club") @Valid ClubCreateDTO request) {
@@ -34,6 +34,7 @@ public class ClubController {
   @PutMapping(
       value = "/update/{clubId}",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @Operation(summary = "Update club name or image")
   public ResponseEntity<Void> update(
       @PathVariable Long clubId,
       @RequestPart(value = "file", required = false) MultipartFile file,

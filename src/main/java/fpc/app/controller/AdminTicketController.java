@@ -35,6 +35,7 @@ public class AdminTicketController {
       value = "/create",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @PreAuthorize("hasPermission(#matchId, 'Match', 'ANY')")
+  @Operation(summary = "Create a ticket sale offer for a match")
   public ResponseEntity<Void> createTicketOffer(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestParam Long matchId,
@@ -47,7 +48,6 @@ public class AdminTicketController {
   }
 
   @PutMapping("/{id}/toggle-status")
-  @Operation(summary = "Toggle ticket offer status")
   @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
   @ApiResponse(
       responseCode = "200",
@@ -56,6 +56,7 @@ public class AdminTicketController {
           @Content(
               mediaType = "application/json",
               examples = @ExampleObject(value = "{\"status\": \"ENABLED\"}")))
+  @Operation(summary = "Toggle ticket offer status")
   public ResponseEntity<Map<String, OfferStatus>> changeTicketOfferStatus(@PathVariable Long id) {
     OfferStatus status = ticketService.toggleTicketOfferStatus(id);
     Map<String, OfferStatus> res = Map.of("status", status);

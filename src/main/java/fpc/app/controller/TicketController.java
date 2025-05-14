@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/ticket")
 @Tag(name = "Tickets")
 @RequiredArgsConstructor
+@Validated
 public class TicketController {
   private final TicketService ticketService;
   private final UserService userService;
@@ -32,8 +33,7 @@ public class TicketController {
   private final SubscriptionService subscriptionService;
 
   @GetMapping
-  @Operation(summary = "Get all available ticket offers")
-  @Validated
+  @Operation(summary = "Get all ticket offers available for sale")
   public ResponseEntity<List<TicketOfferResponseDTO>> getAvailableTicketOffers(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
     User user = userService.getUser(jwtUtil.getUserId(token));
