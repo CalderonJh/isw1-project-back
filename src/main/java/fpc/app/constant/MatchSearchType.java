@@ -8,11 +8,11 @@ public enum MatchSearchType {
   public static MatchSearchType fromString(String str) {
     if (str == null) return ALL;
     return switch (str) {
-      case "T" -> TICKET;
-      case "S" -> SEASON_PASS;
+      case "ticket" -> TICKET;
+      case "season" -> SEASON_PASS;
       default ->
           throw new IllegalArgumentException(
-              "Invalid match search type: " + str + ". Use 'T' for TICKET or 'S' for SEASON_PASS");
+              "Invalid match search type: " + str + ". Use 'ticket' or 'season'");
     };
   }
 }

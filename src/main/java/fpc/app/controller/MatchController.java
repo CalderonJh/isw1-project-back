@@ -40,9 +40,9 @@ public class MatchController {
 
   @GetMapping("/all")
   @Parameter(
-      name = "searchType",
+      name = "toOffer",
       description =
-          "Used to get only valid matches for ticket or season pass offers creation <br> T: Ticket offer <br> S: Season pass offer")
+          "Used to get only valid matches for ticket or season pass offers creation, use: <br> toOffer=ticket for ticket offers <br> toOffer=season for season pass offers")
   @Operation(summary = "List matches")
   public ResponseEntity<List<MatchResponseDTO>> getAllMatches(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
