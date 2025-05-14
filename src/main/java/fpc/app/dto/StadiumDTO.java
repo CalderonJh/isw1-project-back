@@ -1,4 +1,4 @@
-package fpc.app.dto.app;
+package fpc.app.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

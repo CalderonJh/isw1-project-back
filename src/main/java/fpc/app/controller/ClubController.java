@@ -1,7 +1,7 @@
 package fpc.app.controller;
 
-import fpc.app.dto.app.ClubCreateDTO;
-import fpc.app.dto.app.ClubDTO;
+import fpc.app.dto.request.ClubCreateDTO;
+import fpc.app.dto.response.ClubResponseDTO;
 import fpc.app.mapper.ClubMapper;
 import fpc.app.model.app.Club;
 import fpc.app.service.app.ClubService;
@@ -44,7 +44,7 @@ public class ClubController {
 
   @GetMapping("/list")
   @Operation(summary = "List all clubs")
-  public ResponseEntity<List<ClubDTO>> list() {
+  public ResponseEntity<List<ClubResponseDTO>> list() {
     List<Club> clubs = clubService.list();
     return ResponseEntity.ok(ClubMapper.map(clubs));
   }

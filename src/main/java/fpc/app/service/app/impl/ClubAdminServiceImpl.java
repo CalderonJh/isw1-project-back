@@ -9,6 +9,8 @@ import fpc.app.service.app.ClubAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ClubAdminServiceImpl implements ClubAdminService {
@@ -31,5 +33,10 @@ public class ClubAdminServiceImpl implements ClubAdminService {
   @Override
   public ClubAdmin save(ClubAdmin clubAdmin) {
     return clubAdminRepository.save(clubAdmin);
+  }
+
+  @Override
+  public List<Club> getAllClubs() {
+    return clubAdminRepository.getAllClubs();
   }
 }

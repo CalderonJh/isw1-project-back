@@ -1,6 +1,6 @@
 package fpc.app.controller;
 
-import fpc.app.dto.app.StadiumDTO;
+import fpc.app.dto.StadiumDTO;
 import fpc.app.mapper.StadiumMapper;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.Stadium;

@@ -1,8 +1,9 @@
 package fpc.app.service.app.impl;
 
-import static fpc.app.util.Tools.required;
+import static fpc.app.util.Tools.getColTime;
 
-import fpc.app.dto.app.MatchDTO;
+import fpc.app.constant.MatchSearchType;
+import fpc.app.dto.request.MatchCreationDTO;
 import fpc.app.exception.DataNotFoundException;
 import fpc.app.exception.ValidationException;
 import fpc.app.model.app.Club;
@@ -38,7 +39,7 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
-  public Match create(Club homeClub, MatchDTO dto) {
+  public Match create(Club homeClub, MatchCreationDTO dto) {
     validateAwayClub(homeClub, dto.awayClubId());
     Stadium stadium = stadiumService.getStadium(dto.stadiumId());
     Match toSave =
@@ -48,6 +49,7 @@ public class MatchServiceImpl implements MatchService {
             .year(dto.year())
             .season(dto.season())
             .stadium(stadium)
+            .startDate(dto.matchDate())
             .build();
 
     return matchRepository.save(toSave);
@@ -60,7 +62,7 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
-  public void update(Long matchId, MatchDTO dto) {
+  public void update(Long matchId, MatchCreationDTO dto) {
     Match match = getMatch(dto.matchId());
     Club club = match.getHomeClub();
     if (dto.stadiumId().equals(match.getStadium().getId())) {
@@ -80,8 +82,12 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
-  public List<Match> getMatches(@NonNull Club club) {
-    return matchRepository.findByHomeClubId(club.getId());
+  public List<Match> getMatches(@NonNull Club club, MatchSearchType searchType) {
+    return switch (searchType) {
+      case ALL -> matchRepository.findByHomeClubId(club.getId());
+      case TICKET -> matchRepository.findValidMatchesForTicketsOffer(club.getId(), getColTime());
+      case SEASON_PASS -> matchRepository.findByHomeClubIdAndFuture(club.getId(), getColTime());
+    };
   }
 
   @Override

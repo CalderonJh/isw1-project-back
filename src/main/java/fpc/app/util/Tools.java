@@ -1,7 +1,6 @@
 package fpc.app.util;
 
 import fpc.app.dto.util.Suggestion;
-import fpc.app.exception.DataNotFoundException;
 import fpc.app.exception.ValidationException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -9,8 +8,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-
-import static java.util.Objects.requireNonNull;
 
 @Slf4j
 public class Tools {
@@ -59,24 +56,17 @@ public class Tools {
     return removeExtraSpaces(t1).equalsIgnoreCase(removeExtraSpaces(t2));
   }
 
-  public static <T> T required(T o) {
-    return required(o, "Resource not found");
-  }
-
-  public static <T> T required(T o, String message) {
-    if (o == null) {
-      throw new DataNotFoundException(message);
-    }
-    return o;
-  }
-
   public static LocalDateTime getColTime() {
     return LocalDateTime.now(ZoneId.of("America/Bogota"));
   }
 
   public static void validateIsFutureDate(LocalDateTime date) {
+    validateIsFutureDate(date, "Date must be in the future");
+  }
+
+  public static void validateIsFutureDate(LocalDateTime date, String message) {
     if (date.isBefore(getColTime())) {
-      throw new ValidationException("Date must be in the future");
+      throw new ValidationException(message);
     }
   }
 

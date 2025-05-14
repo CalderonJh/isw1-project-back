@@ -1,13 +1,19 @@
 package fpc.app.controller;
 
-import fpc.app.dto.app.CreateTicketOfferDTO;
+import fpc.app.constant.OfferStatus;
+import fpc.app.dto.request.CreateTicketOfferDTO;
 import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
 import fpc.app.service.app.TicketService;
 import fpc.app.service.auth.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -38,5 +44,21 @@ public class AdminTicketController {
     User publisher = userService.getUser(jwtUtil.getUserId(token));
     ticketService.createTicketOffer(publisher, matchId, dto, file);
     return ResponseEntity.ok().build();
+  }
+
+  @PutMapping("/{id}/toggle-status")
+  @Operation(summary = "Toggle ticket offer status")
+  @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
+  @ApiResponse(
+      responseCode = "200",
+      description = "Nuevo estado de la oferta",
+      content =
+          @Content(
+              mediaType = "application/json",
+              examples = @ExampleObject(value = "{\"status\": \"ENABLED\"}")))
+  public ResponseEntity<Map<String, OfferStatus>> changeTicketOfferStatus(@PathVariable Long id) {
+    OfferStatus status = ticketService.toggleTicketOfferStatus(id);
+    Map<String, OfferStatus> res = Map.of("status", status);
+    return ResponseEntity.ok(res);
   }
 }

@@ -1,8 +1,8 @@
 package fpc.app.controller;
 
 
-import fpc.app.dto.user.LoginRequest;
-import fpc.app.dto.user.UserDTO;
+import fpc.app.dto.request.LoginRequest;
+import fpc.app.dto.UserDTO;
 import fpc.app.service.auth.impl.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

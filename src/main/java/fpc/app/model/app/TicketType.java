@@ -2,9 +2,8 @@ package fpc.app.model.app;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
 import java.math.BigDecimal;
+import lombok.*;
 
 @Getter
 @Setter
@@ -18,10 +17,9 @@ public class TicketType {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotNull
-	@ManyToOne
-	@JoinColumn(name = "ticket_offer_id")
-	private TicketOffer ticketOffer;
+  @NotNull
+  @Column(name = "ticket_offer_id")
+  private Long ticketOfferId;
 
 	@NotNull
 	@ManyToOne

@@ -1,4 +1,4 @@
-package fpc.app.dto.user;
+package fpc.app.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;

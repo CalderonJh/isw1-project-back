@@ -29,4 +29,8 @@ public class Stand {
 		this.name = name;
 		this.capacity = capacity;
 	}
+
+	public Stand(Long id) {
+		this.id = id;
+	}
 }

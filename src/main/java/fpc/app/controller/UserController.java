@@ -1,8 +1,8 @@
 package fpc.app.controller;
 
-import fpc.app.dto.user.UpdateUserDTO;
-import fpc.app.dto.user.UpdateUserPasswordDTO;
-import fpc.app.dto.user.UserDTO;
+import fpc.app.dto.request.UpdateUserDTO;
+import fpc.app.dto.request.UpdateUserPasswordDTO;
+import fpc.app.dto.UserDTO;
 import fpc.app.mapper.UserMapper;
 import fpc.app.model.app.Club;
 import fpc.app.model.auth.User;

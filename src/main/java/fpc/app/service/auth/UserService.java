@@ -1,7 +1,7 @@
 package fpc.app.service.auth;
 
-import fpc.app.dto.user.UserDTO;
-import fpc.app.dto.user.UpdateUserDTO;
+import fpc.app.dto.UserDTO;
+import fpc.app.dto.request.UpdateUserDTO;
 import fpc.app.model.app.IdentityDocument;
 import fpc.app.model.auth.Role;
 import fpc.app.model.auth.User;

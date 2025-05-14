@@ -3,22 +3,24 @@ package fpc.app.service.app.impl;
 import static fpc.app.util.Tools.*;
 
 import fpc.app.constant.OfferStatus;
-import fpc.app.dto.app.CreateTicketOfferDTO;
+import fpc.app.dto.request.CreateTicketOfferDTO;
+import fpc.app.dto.request.StandPriceDTO;
+import fpc.app.exception.DataNotFoundException;
 import fpc.app.exception.ValidationException;
-import fpc.app.model.app.ClubAdmin;
-import fpc.app.model.app.Match;
-import fpc.app.model.app.TicketOffer;
+import fpc.app.model.app.*;
 import fpc.app.model.auth.User;
 import fpc.app.repository.app.TicketOfferRepository;
+import fpc.app.repository.app.TicketTypeRepository;
 import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.MatchService;
 import fpc.app.service.app.TicketService;
 import fpc.app.service.util.CloudinaryService;
-import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -28,30 +30,48 @@ public class TicketServiceImpl implements TicketService {
   private final MatchService matchService;
   private final CloudinaryService cloudinaryService;
   private final ClubAdminService clubAdminService;
+  private final TicketTypeRepository ticketTypeRepository;
 
   @Override
+  @Transactional
   public void createTicketOffer(
       User creator, Long matchId, CreateTicketOfferDTO dto, MultipartFile file) {
     ClubAdmin clubAdmin = clubAdminService.getClubAdmin(creator);
     String imageId = cloudinaryService.uploadImage(file);
     Match match = matchService.getMatch(matchId);
-    validateMatchDate(match);
+    validateMatch(match);
     LocalDateTime saleStartDate = validateSaleStartDate(dto.saleStartDate(), match);
     LocalDateTime saleEndDate = validateSaleEndDate(saleStartDate, dto.saleEndDate(), match);
-    save(
-        TicketOffer.builder()
-            .match(match)
-            .publisher(clubAdmin)
-            .startDate(saleStartDate)
-            .endDate(saleEndDate)
-            .imageId(imageId)
-            .build());
+    TicketOffer saved =
+        save(
+            TicketOffer.builder()
+                .match(match)
+                .publisher(clubAdmin)
+                .startDate(saleStartDate)
+                .endDate(saleEndDate)
+                .imageId(imageId)
+                .build());
+    createTicketOfferTypes(saved.getId(), dto.standPrices());
   }
 
-  private void validateMatchDate(Match match) {
+  private void createTicketOfferTypes(
+      Long ticketOfferId, @Size(min = 1) List<StandPriceDTO> standPriceDTOS) {
+    standPriceDTOS.forEach(
+        standPrice ->
+            ticketTypeRepository.save(
+                TicketType.builder()
+                    .ticketOfferId(ticketOfferId)
+                    .stand(new Stand(standPrice.standId()))
+                    .price(standPrice.price())
+                    .build()));
+  }
+
+  private void validateMatch(Match match) {
     if (match.getStartDate() == null)
       throw new ValidationException("No se ha definido la fecha del partido");
-    validateIsFutureDate(match.getStartDate());
+    validateIsFutureDate(match.getStartDate(), "La fecha del partido debe ser futura");
+    if (ticketOfferRepository.existsMatchTicketOffer(match.getId(), getColTime()))
+      throw new ValidationException("Ya existe una oferta de tickets activa para este partido");
   }
 
   private LocalDateTime validateSaleStartDate(LocalDateTime startDate, Match match) {
@@ -61,6 +81,7 @@ public class TicketServiceImpl implements TicketService {
       throw new ValidationException(
           "La fecha de inicio de venta debe ser al menos una hora antes del inicio del partido");
     }
+
     return startDate;
   }
 
@@ -76,28 +97,25 @@ public class TicketServiceImpl implements TicketService {
     return ticketOfferRepository.save(ticketOffer);
   }
 
-  public void changeTicketOfferStatus(Long ticketOfferId, OfferStatus status) {
-    TicketOffer offer = required(get(ticketOfferId));
-    if (OfferStatus.ENABLED.equals(status)) {
-      enableTickeOffer(offer);
-    } else if (OfferStatus.DISABLED.equals(status)) {
-      disableTicketOffer(offer);
-    }
+  @Override
+  public OfferStatus toggleTicketOfferStatus(Long ticketOfferId) {
+    TicketOffer offer = this.get(ticketOfferId);
+    offer.setPaused(!offer.isPaused());
+    ticketOfferRepository.save(offer);
+    return OfferStatus.get(offer.isPaused());
   }
 
-  private void disableTicketOffer(TicketOffer offer) {
-    offer.setEndDate(getColTime());
-    save(offer);
-  }
-
-  private void enableTickeOffer(TicketOffer offer) {}
-
-  public @Nullable TicketOffer get(Long ticketOfferId) {
-    return ticketOfferRepository.findById(ticketOfferId).orElse(null);
+  public TicketOffer get(Long ticketOfferId) {
+    return ticketOfferRepository.findById(ticketOfferId).orElseThrow(DataNotFoundException::new);
   }
 
   @Override
-  public List<TicketOffer> getOffers(List<Long> clubIds) {
+  public List<TicketOffer> getActiveOffers(List<Long> clubIds) {
     return ticketOfferRepository.getOffersByClubIdIn(clubIds);
+  }
+
+  @Override
+  public List<TicketType> getTicketOfferTypes(Long ticketId) {
+    return ticketTypeRepository.findByTicketOfferId(ticketId);
   }
 }

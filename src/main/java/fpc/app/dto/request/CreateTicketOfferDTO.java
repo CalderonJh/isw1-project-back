@@ -1,4 +1,4 @@
-package fpc.app.dto.app;
+package fpc.app.dto.request;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;

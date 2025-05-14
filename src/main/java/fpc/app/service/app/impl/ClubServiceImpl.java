@@ -2,7 +2,7 @@ package fpc.app.service.app.impl;
 
 import static fpc.app.util.Tools.removeExtraSpaces;
 
-import fpc.app.dto.app.ClubCreateDTO;
+import fpc.app.dto.request.ClubCreateDTO;
 import fpc.app.exception.DataNotFoundException;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.ClubAdmin;
@@ -79,5 +79,11 @@ public class ClubServiceImpl implements ClubService {
   @Override
   public List<Club> list() {
     return clubRepository.findAll();
+  }
+
+  @Override
+  public List<Club> listForMatch(Club homeTeam) {
+    var clubs = clubRepository.findAll();
+    return clubs.stream().filter(club -> !club.getId().equals(homeTeam.getId())).toList();
   }
 }

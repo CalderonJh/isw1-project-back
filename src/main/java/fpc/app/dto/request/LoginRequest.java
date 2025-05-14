@@ -1,4 +1,4 @@
-package fpc.app.dto.user;
+package fpc.app.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;

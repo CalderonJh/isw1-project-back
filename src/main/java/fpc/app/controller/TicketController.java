@@ -1,19 +1,24 @@
 package fpc.app.controller;
 
-import fpc.app.dto.app.TicketOfferDTO;
+import fpc.app.dto.response.TicketOfferResponseDTO;
+import fpc.app.dto.response.TicketTypeDTO;
 import fpc.app.mapper.TicketMapper;
 import fpc.app.model.app.TicketOffer;
+import fpc.app.model.app.TicketType;
 import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
 import fpc.app.service.app.SubscriptionService;
 import fpc.app.service.app.TicketService;
 import fpc.app.service.auth.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,11 +32,21 @@ public class TicketController {
   private final SubscriptionService subscriptionService;
 
   @GetMapping
-  public ResponseEntity<List<TicketOfferDTO>> getAvailableTicketOffers(
+  @Operation(summary = "Get all available ticket offers")
+  @Validated
+  public ResponseEntity<List<TicketOfferResponseDTO>> getAvailableTicketOffers(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
     User user = userService.getUser(jwtUtil.getUserId(token));
     List<Long> clubIds = subscriptionService.getSubscriptionsIds(user);
-    List<TicketOffer> offers = ticketService.getOffers(clubIds);
+    List<TicketOffer> offers = ticketService.getActiveOffers(clubIds);
     return ResponseEntity.ok(TicketMapper.toDTO(offers));
+  }
+
+  @GetMapping("/types")
+  @Operation(summary = "Get ticket details")
+  public ResponseEntity<List<TicketTypeDTO>> getTicketOfferTypes(
+      @RequestParam @Positive Long ticketId) {
+    List<TicketType> offerTypes = ticketService.getTicketOfferTypes(ticketId);
+    return ResponseEntity.ok(TicketMapper.toTicketTypeDTO(offerTypes));
   }
 }

@@ -1,6 +1,6 @@
 package fpc.app.mapper;
 
-import fpc.app.dto.user.UserDTO;
+import fpc.app.dto.UserDTO;
 import fpc.app.model.auth.User;
 
 public class UserMapper {

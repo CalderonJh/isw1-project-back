@@ -1,14 +1,14 @@
 package fpc.app.mapper;
 
-import fpc.app.dto.app.ClubDTO;
+import fpc.app.dto.response.ClubResponseDTO;
 import fpc.app.model.app.Club;
 import java.util.List;
 
 public class ClubMapper {
   private ClubMapper() {}
 
-  public static ClubDTO map(Club club) {
-    return ClubDTO.builder()
+  public static ClubResponseDTO map(Club club) {
+    return ClubResponseDTO.builder()
         .id(club.getId())
         .name(club.getName())
         .shortName(club.getShortName())
@@ -16,7 +16,7 @@ public class ClubMapper {
         .build();
   }
 
-  public static List<ClubDTO> map(List<Club> clubs) {
+  public static List<ClubResponseDTO> map(List<Club> clubs) {
     return clubs.stream().map(ClubMapper::map).toList();
   }
 }

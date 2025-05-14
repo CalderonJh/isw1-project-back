@@ -1,10 +1,14 @@
 package fpc.app.controller;
 
-import static fpc.app.util.Tools.required;
+import static fpc.app.util.Tools.hasText;
 
-import fpc.app.dto.app.MatchDTO;
+import fpc.app.constant.MatchSearchType;
+import fpc.app.dto.response.ClubResponseDTO;
+import fpc.app.dto.request.MatchCreationDTO;
+import fpc.app.dto.response.MatchResponseDTO;
+import fpc.app.mapper.ClubMapper;
+import fpc.app.mapper.MatchMapper;
 import fpc.app.model.app.Club;
-import fpc.app.model.app.Match;
 import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
 import fpc.app.service.app.ClubAdminService;
@@ -35,24 +39,38 @@ public class MatchController {
   private final ClubAdminService clubAdminService;
 
   @GetMapping("/all")
-  public ResponseEntity<List<MatchDTO>> getAllMatches(
-      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+  @Parameter(name = "type", description = "T for Ticket, S for Season Pass")
+  public ResponseEntity<List<MatchResponseDTO>> getAllMatches(
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+      @RequestParam String searchType) {
+    MatchSearchType matchSearchType =
+        hasText(searchType) ? MatchSearchType.fromString(searchType) : MatchSearchType.ALL;
     Long userId = jwtUtil.getUserId(token);
     Club club = clubService.getClubByAdmin(userId);
-    var matches = matchService.getMatches(club);
-    return ResponseEntity.ok(matches.stream().map(this::toDTO).toList());
+    var matches = matchService.getMatches(club, matchSearchType);
+    return ResponseEntity.ok(MatchMapper.toResponseDTO(matches));
+  }
+
+  @GetMapping("/clubs")
+  @Operation(summary = "List available clubs for match creation")
+  public ResponseEntity<List<ClubResponseDTO>> list(
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+    User user = userService.getUser(jwtUtil.getUserId(token));
+    Club club = clubService.getClubByAdmin(user);
+    List<Club> clubs = clubService.listForMatch(club);
+    return ResponseEntity.ok(ClubMapper.map(clubs));
   }
 
   @PostMapping("/save")
   @Operation(summary = "Create or update a match")
   public ResponseEntity<Void> saveMatch(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-      @RequestBody @Valid MatchDTO matchDTO) {
+      @RequestBody @Valid MatchCreationDTO matchCreationDTO) {
     Long userId = jwtUtil.getUserId(token);
-    User user = required(userService.getUser(userId));
+    User user = userService.getUser(userId);
     Club homeClub = clubAdminService.getClub(user);
 
-    matchService.create(homeClub, matchDTO);
+    matchService.create(homeClub, matchCreationDTO);
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
@@ -60,25 +78,15 @@ public class MatchController {
   @PreAuthorize("hasPermission(#matchId, 'Match', 'ANY')")
   @Operation(summary = "Update a match")
   public ResponseEntity<Void> updateMatch(
-      @PathVariable Long matchId, @RequestBody @Valid MatchDTO matchDTO) {
-    matchService.update(matchId, matchDTO);
+      @PathVariable Long matchId, @RequestBody @Valid MatchCreationDTO matchCreationDTO) {
+    matchService.update(matchId, matchCreationDTO);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
   @DeleteMapping("/delete/{id}")
   @PreAuthorize("hasPermission(#id, 'Match', 'ANY')")
-  public ResponseEntity<MatchDTO> removeMatch(@PathVariable Long id) {
+  public ResponseEntity<MatchCreationDTO> removeMatch(@PathVariable Long id) {
     matchService.deleteMatch(id);
     return ResponseEntity.status(HttpStatus.OK).build();
-  }
-
-  private MatchDTO toDTO(Match match) {
-    return MatchDTO.builder()
-        .matchId(match.getId())
-        .awayClubId(match.getAwayClub().getId())
-        .year(match.getYear())
-        .season(match.getSeason())
-        .stadiumId(match.getStadium().getId())
-        .build();
   }
 }

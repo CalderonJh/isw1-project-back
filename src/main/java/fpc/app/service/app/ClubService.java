@@ -1,6 +1,6 @@
 package fpc.app.service.app;
 
-import fpc.app.dto.app.ClubCreateDTO;
+import fpc.app.dto.request.ClubCreateDTO;
 import fpc.app.model.app.Club;
 import fpc.app.model.auth.User;
 import java.util.List;
@@ -22,4 +22,6 @@ public interface ClubService {
 	void update(Long clubId, ClubCreateDTO request, MultipartFile file);
 
   List<Club> list();
+
+	List<Club> listForMatch(Club homeTeam);
 }

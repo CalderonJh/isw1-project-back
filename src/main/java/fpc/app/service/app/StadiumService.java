@@ -1,6 +1,6 @@
 package fpc.app.service.app;
 
-import fpc.app.dto.app.StadiumDTO;
+import fpc.app.dto.StadiumDTO;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.Stadium;
 import java.util.List;

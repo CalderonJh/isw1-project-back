@@ -2,7 +2,7 @@ package fpc.app.service.auth.impl;
 
 import static java.util.Objects.isNull;
 
-import fpc.app.dto.user.UserDTO;
+import fpc.app.dto.UserDTO;
 import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
 import fpc.app.service.auth.UserService;

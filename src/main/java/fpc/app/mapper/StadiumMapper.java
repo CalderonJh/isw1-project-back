@@ -1,7 +1,7 @@
 package fpc.app.mapper;
 
-import fpc.app.dto.app.StadiumDTO;
-import fpc.app.dto.app.StandDTO;
+import fpc.app.dto.StadiumDTO;
+import fpc.app.dto.StandDTO;
 import fpc.app.model.app.Stadium;
 import fpc.app.model.app.Stand;
 import java.util.List;

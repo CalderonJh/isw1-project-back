@@ -2,8 +2,8 @@ package fpc.app.service.auth.impl;
 
 import static fpc.app.util.Tools.*;
 
-import fpc.app.dto.user.UpdateUserDTO;
-import fpc.app.dto.user.UserDTO;
+import fpc.app.dto.UserDTO;
+import fpc.app.dto.request.UpdateUserDTO;
 import fpc.app.exception.DataNotFoundException;
 import fpc.app.exception.ValidationException;
 import fpc.app.model.app.IdentityDocument;
@@ -15,7 +15,6 @@ import fpc.app.repository.app.PersonRepository;
 import fpc.app.repository.auth.RoleRepository;
 import fpc.app.repository.auth.UserRepository;
 import fpc.app.service.auth.UserService;
-import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,8 +41,8 @@ public class UserServiceImpl implements UserService {
     return userRepository.save(
         User.builder()
             .person(person)
-            .username(request.getEmail())
-            .password(encoder.encode(request.getPassword()))
+            .username(request.email())
+            .password(encoder.encode(request.password()))
             .roles(Set.of(roleRepository.findByName("USER").orElseThrow()))
             .build());
   }
@@ -51,25 +50,25 @@ public class UserServiceImpl implements UserService {
   private Person savePersonInfo(UserDTO request) {
     return personRepository.save(
         Person.builder()
-            .name(request.getName())
-            .lastName(request.getLastName())
-            .birthday(request.getBirthDate())
-            .gender(request.getGender())
-            .documentType(new IdentityDocument(request.getDocumentTypeId()))
-            .documentNumber(request.getDocumentNumber())
-            .phone(request.getPhoneNumber())
-            .email(request.getEmail())
+            .name(request.name())
+            .lastName(request.lastName())
+            .birthday(request.birthDate())
+            .gender(request.gender())
+            .documentType(new IdentityDocument(request.documentTypeId()))
+            .documentNumber(request.documentNumber())
+            .phone(request.phoneNumber())
+            .email(request.email())
             .build());
   }
 
   private void validateUserRegistrationRequest(UserDTO request) {
-    validateEmail(request.getEmail());
+    validateEmail(request.email());
     validateDocument(request);
   }
 
   private void validateDocument(UserDTO request) {
     if (personRepository.existsByDocumentTypeIdAndDocumentNumber(
-        request.getDocumentTypeId(), request.getDocumentNumber()))
+        request.documentTypeId(), request.documentNumber()))
       throw new ValidationException("Ya hay un usuario registrado con ese documento");
   }
 
@@ -80,14 +79,16 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserDetails loadUser(Long userId) {
-    User user = required(getUser(userId), "User not found");
+    User user = getUser(userId);
     return new org.springframework.security.core.userdetails.User(
         user.getId().toString(), user.getPassword(), new ArrayList<>());
   }
 
   @Override
-  public @Nullable User getUser(Long userID) {
-    return userRepository.findById(userID).orElse(null);
+  public User getUser(Long userID) {
+    return userRepository
+        .findById(userID)
+        .orElseThrow(() -> new DataNotFoundException("User not found with given ID"));
   }
 
   @Override
