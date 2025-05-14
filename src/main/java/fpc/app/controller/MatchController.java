@@ -46,7 +46,7 @@ public class MatchController {
   @Operation(summary = "List matches")
   public ResponseEntity<List<MatchResponseDTO>> getAllMatches(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-      @RequestParam String searchType) {
+      @RequestParam(required = false) String searchType) {
     MatchSearchType matchSearchType =
         hasText(searchType) ? MatchSearchType.fromString(searchType) : MatchSearchType.ALL;
     Long userId = jwtUtil.getUserId(token);
