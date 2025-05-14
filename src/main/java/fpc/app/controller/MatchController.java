@@ -46,9 +46,9 @@ public class MatchController {
   @Operation(summary = "List matches")
   public ResponseEntity<List<MatchResponseDTO>> getAllMatches(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-      @RequestParam(required = false) String searchType) {
+      @RequestParam(required = false) String toOffer) {
     MatchSearchType matchSearchType =
-        hasText(searchType) ? MatchSearchType.fromString(searchType) : MatchSearchType.ALL;
+        hasText(toOffer) ? MatchSearchType.fromString(toOffer) : MatchSearchType.ALL;
     Long userId = jwtUtil.getUserId(token);
     Club club = clubService.getClubByAdmin(userId);
     var matches = matchService.getMatches(club, matchSearchType);
