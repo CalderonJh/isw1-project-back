@@ -1,6 +1,7 @@
 package fpc.app.service.app.impl;
 
 import static fpc.app.util.Tools.getColTime;
+import static java.util.Objects.isNull;
 
 import fpc.app.constant.MatchSearchType;
 import fpc.app.dto.request.MatchCreationDTO;
@@ -82,11 +83,13 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
-  public List<Match> getMatches(@NonNull Club club, MatchSearchType searchType) {
+  public List<Match> getMatches(@NonNull Club club, MatchSearchType searchType, Long stadiumId) {
+    if (searchType.equals(MatchSearchType.SEASON_PASS) && isNull(stadiumId))
+      throw new ValidationException("Se debe definir un estadio");
     return switch (searchType) {
-      case ALL -> matchRepository.findByHomeClubId(club.getId());
-      case TICKET -> matchRepository.findValidMatchesForTicketsOffer(club.getId(), getColTime());
-      case SEASON_PASS -> matchRepository.findByHomeClubIdAndFuture(club.getId(), getColTime());
+      case ALL -> matchRepository.findByHomeClubId(club.getId(), stadiumId);
+      case TICKET -> matchRepository.findValidMatchesForTicketsOffer(club.getId(), getColTime(), stadiumId);
+      case SEASON_PASS -> matchRepository.findByHomeClubIdAndFuture(club.getId(), getColTime(), stadiumId);
     };
   }
 

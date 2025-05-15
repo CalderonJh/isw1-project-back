@@ -15,7 +15,7 @@ public interface MatchService {
 
   void update(Long matchId, MatchCreationDTO dto);
 
-  List<Match> getMatches(Club club, MatchSearchType searchType);
+  List<Match> getMatches(Club club, MatchSearchType searchType, Long stadiumId);
 
   void deleteMatch(Long id);
 }

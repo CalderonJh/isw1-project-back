@@ -44,14 +44,16 @@ public class MatchController {
       description =
           "Used to get only valid matches for ticket or season pass offers creation, use: <br> toOffer=ticket for ticket offers <br> toOffer=season for season pass offers")
   @Operation(summary = "List matches")
+  @Parameter(name = "stadium", description = "Stadium id. Allows filtering matches by stadium")
   public ResponseEntity<List<MatchResponseDTO>> getAllMatches(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+      @RequestParam(name = "stadium", required = false) Long stadiumId,
       @RequestParam(required = false) String toOffer) {
     MatchSearchType matchSearchType =
         hasText(toOffer) ? MatchSearchType.fromString(toOffer) : MatchSearchType.ALL;
     Long userId = jwtUtil.getUserId(token);
     Club club = clubService.getClubByAdmin(userId);
-    var matches = matchService.getMatches(club, matchSearchType);
+    var matches = matchService.getMatches(club, matchSearchType, stadiumId);
     return ResponseEntity.ok(MatchMapper.toResponseDTO(matches));
   }
 
