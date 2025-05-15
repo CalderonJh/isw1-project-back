@@ -14,6 +14,8 @@ import fpc.app.repository.app.MatchRepository;
 import fpc.app.service.app.ClubService;
 import fpc.app.service.app.MatchService;
 import fpc.app.service.app.StadiumService;
+import jakarta.validation.constraints.Future;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +45,12 @@ public class MatchServiceImpl implements MatchService {
   public Match create(Club homeClub, MatchCreationDTO dto) {
     validateAwayClub(homeClub, dto.awayClubId());
     Stadium stadium = stadiumService.getStadium(dto.stadiumId());
+    Club awayClub = clubService.getClub(dto.awayClubId());
+    validateMatchDay(homeClub.getId(), dto.matchDate());
     Match toSave =
         Match.builder()
             .homeClub(homeClub)
-            .awayClub(clubService.getClub(dto.awayClubId()))
+            .awayClub(awayClub)
             .year(dto.year())
             .season(dto.season())
             .stadium(stadium)
@@ -54,6 +58,13 @@ public class MatchServiceImpl implements MatchService {
             .build();
 
     return matchRepository.save(toSave);
+  }
+
+  private void validateMatchDay(Long clubId, @Future LocalDateTime localDateTime) {
+    LocalDateTime start = localDateTime.toLocalDate().atStartOfDay();
+    LocalDateTime end = start.plusDays(1);
+    if (matchRepository.existsByDay(clubId, start, end))
+      throw new ValidationException("Ya existe un partido para ese día");
   }
 
   private void validateAwayClub(Club club, Long awayTeamId) {

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface MatchRepository extends JpaRepository<Match, Long> {
   @Query(
@@ -36,4 +37,9 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
 
   @Query("select m from Match m where m.homeClub.id = :id and m.startDate > :colTime and :stadiumId is null or m.stadium.id = :stadiumId")
   List<Match> findByHomeClubIdAndFuture(Long id, LocalDateTime colTime, Long stadiumId);
+
+  @Query(
+      "SELECT COUNT(m) > 0 FROM Match m WHERE m.homeClub.id = :clubId and m.startDate >= :start AND m.startDate < :end")
+  boolean existsByDay(
+      Long clubId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }
