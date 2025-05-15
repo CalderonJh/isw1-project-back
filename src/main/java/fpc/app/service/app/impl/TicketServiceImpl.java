@@ -78,10 +78,9 @@ public class TicketServiceImpl implements TicketService {
   private LocalDateTime validateSaleStartDate(LocalDateTime startDate, Match match) {
     if (startDate == null) return getColTime();
     validateIsFutureDate(startDate);
-    if (!startDate.isBefore(match.getStartDate().minusHours(1))) {
+    if (startDate.isAfter(match.getStartDate()))
       throw new ValidationException(
-          "La fecha de inicio de venta debe ser al menos una hora antes del inicio del partido");
-    }
+          "La fecha de inicio de venta debe ser antes del inicio del partido");
 
     return startDate;
   }
@@ -89,8 +88,12 @@ public class TicketServiceImpl implements TicketService {
   /** Start date should already have been validated */
   private LocalDateTime validateSaleEndDate(
       LocalDateTime startDate, LocalDateTime endDate, Match match) {
-    if (endDate == null) return match.getStartDate().minusMinutes(1);
+    if (endDate == null) return match.getStartDate();
     validateDateRange(startDate, endDate);
+    if (endDate.isAfter(match.getStartDate()))
+      throw new ValidationException(
+          "La fecha de cierre de venta debe ser antes del inicio del partido");
+
     return endDate;
   }
 
