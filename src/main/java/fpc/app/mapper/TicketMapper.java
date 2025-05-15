@@ -9,7 +9,7 @@ import fpc.app.model.app.TicketType;
 import java.util.List;
 
 public class TicketMapper {
-  public static TicketOfferResponseDTO toDTO(TicketOffer ticketOffer) {
+  public static TicketOfferResponseDTO toResponseDTO(TicketOffer ticketOffer) {
     Club homeClub = ticketOffer.getMatch().getHomeClub();
     Club awayClub = ticketOffer.getMatch().getAwayClub();
     return TicketOfferResponseDTO.builder()
@@ -22,8 +22,8 @@ public class TicketMapper {
         .build();
   }
 
-  public static List<TicketOfferResponseDTO> toDTO(List<TicketOffer> offers) {
-    return offers.stream().map(TicketMapper::toDTO).toList();
+  public static List<TicketOfferResponseDTO> toResponseDTO(List<TicketOffer> offers) {
+    return offers.stream().map(TicketMapper::toResponseDTO).toList();
   }
 
   public static TicketTypeDTO toTicketTypeDTO(TicketType ticketType) {

@@ -15,4 +15,7 @@ public interface TicketOfferRepository extends JpaRepository<TicketOffer, Long> 
 
   @Query("select count(o.id) > 0 from TicketOffer o where o.match.id = :matchId")
   boolean existsMatchTicketOffer(Long matchId, LocalDateTime now);
+
+  @Query("select o from TicketOffer o where o.publisher.club.id = :clubId")
+  List<TicketOffer> findByClubId(Long clubId);
 }

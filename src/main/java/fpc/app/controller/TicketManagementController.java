@@ -2,8 +2,14 @@ package fpc.app.controller;
 
 import fpc.app.constant.OfferStatus;
 import fpc.app.dto.request.CreateTicketOfferDTO;
+import fpc.app.dto.response.TicketOfferResponseDTO;
+import fpc.app.dto.util.DateRange;
+import fpc.app.mapper.TicketMapper;
+import fpc.app.model.app.Club;
+import fpc.app.model.app.TicketOffer;
 import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
+import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.TicketService;
 import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -26,10 +33,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/club-admin/ticket")
 @RequiredArgsConstructor
 @Tag(name = "Tickets offer management")
-public class AdminTicketController {
+public class TicketManagementController {
   private final TicketService ticketService;
   private final UserService userService;
   private final JwtUtil jwtUtil;
+  private final ClubAdminService clubAdminService;
 
   @PostMapping(
       value = "/create",
@@ -47,6 +55,16 @@ public class AdminTicketController {
     return ResponseEntity.ok().build();
   }
 
+  @GetMapping("/all")
+  @Operation(summary = "Get all ticket offers for the current club")
+  public ResponseEntity<List<TicketOfferResponseDTO>> getAllTicketOffers(
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+    User user = userService.getUser(jwtUtil.getUserId(token));
+    Club club = clubAdminService.getClub(user);
+    List<TicketOffer> offers = ticketService.getAllClubOffers(club);
+    return ResponseEntity.ok(TicketMapper.toResponseDTO(offers));
+  }
+
   @PutMapping("/{id}/toggle-status")
   @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
   @ApiResponse(
@@ -61,5 +79,25 @@ public class AdminTicketController {
     OfferStatus status = ticketService.toggleTicketOfferStatus(id);
     Map<String, OfferStatus> res = Map.of("status", status);
     return ResponseEntity.ok(res);
+  }
+
+  @PutMapping(
+      value = "/{id}/update/image",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
+  @Operation(summary = "Update ticket offer image")
+  public ResponseEntity<Void> updateTicketOfferImage(
+      @PathVariable Long id, @RequestPart MultipartFile file) {
+    ticketService.updateTicketOfferImage(id, file);
+    return ResponseEntity.ok().build();
+  }
+
+  @PutMapping("/{id}/update/dates")
+  @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
+  @Operation(summary = "Update ticket offer dates")
+  public ResponseEntity<Void> updateTicketOfferDates(
+      @PathVariable Long id, @RequestBody DateRange dateRange) {
+    ticketService.updateTicketOfferDates(id, dateRange);
+    return ResponseEntity.ok().build();
   }
 }

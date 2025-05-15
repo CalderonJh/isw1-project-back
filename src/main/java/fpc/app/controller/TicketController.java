@@ -39,7 +39,7 @@ public class TicketController {
     User user = userService.getUser(jwtUtil.getUserId(token));
     List<Long> clubIds = subscriptionService.getSubscriptionsIds(user);
     List<TicketOffer> offers = ticketService.getActiveOffers(clubIds);
-    return ResponseEntity.ok(TicketMapper.toDTO(offers));
+    return ResponseEntity.ok(TicketMapper.toResponseDTO(offers));
   }
 
   @GetMapping("/types")

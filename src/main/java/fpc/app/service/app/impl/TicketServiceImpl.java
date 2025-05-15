@@ -5,6 +5,7 @@ import static fpc.app.util.Tools.*;
 import fpc.app.constant.OfferStatus;
 import fpc.app.dto.request.CreateTicketOfferDTO;
 import fpc.app.dto.request.StandPriceDTO;
+import fpc.app.dto.util.DateRange;
 import fpc.app.exception.DataNotFoundException;
 import fpc.app.exception.ValidationException;
 import fpc.app.model.app.*;
@@ -115,7 +116,37 @@ public class TicketServiceImpl implements TicketService {
   }
 
   @Override
+  public List<TicketOffer> getAllClubOffers(Club club) {
+    return ticketOfferRepository.findByClubId(club.getId());
+  }
+
+  @Override
   public List<TicketType> getTicketOfferTypes(Long ticketId) {
     return ticketTypeRepository.findByTicketOfferId(ticketId);
+  }
+
+  @Override
+  @Transactional
+  public void updateTicketOfferImage(Long offerId, MultipartFile image) {
+    TicketOffer offer = this.get(offerId);
+    if (offer.getImageId() != null) cloudinaryService.deleteImage(offer.getImageId());
+
+    String imageId = cloudinaryService.uploadImage(image);
+    offer.setImageId(imageId);
+    ticketOfferRepository.save(offer);
+  }
+
+  @Override
+  public void updateTicketOfferDates(Long offerId, DateRange dateRange) {
+    TicketOffer offer = this.get(offerId);
+    if (!dateRange.start().equals(offer.getStartDate())) {
+      validateSaleStartDate(dateRange.start(), offer.getMatch());
+      offer.setStartDate(dateRange.start());
+    }
+    if (!dateRange.end().equals(offer.getEndDate())) {
+      validateSaleEndDate(dateRange.start(), dateRange.end(), offer.getMatch());
+      offer.setEndDate(dateRange.end());
+    }
+    ticketOfferRepository.save(offer);
   }
 }
