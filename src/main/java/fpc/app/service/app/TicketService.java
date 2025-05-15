@@ -2,6 +2,7 @@ package fpc.app.service.app;
 
 import fpc.app.constant.OfferStatus;
 import fpc.app.dto.request.CreateTicketOfferDTO;
+import fpc.app.dto.request.StandPriceDTO;
 import fpc.app.dto.util.DateRange;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.TicketOffer;
@@ -27,4 +28,6 @@ public interface TicketService {
 	void updateTicketOfferImage(Long offerId, MultipartFile image);
 
 	void updateTicketOfferDates(Long offerId, DateRange dateRange);
+
+	void updateTicketOfferPrice(Long offerId, List<StandPriceDTO> prices);
 }

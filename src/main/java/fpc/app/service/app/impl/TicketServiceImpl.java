@@ -139,14 +139,25 @@ public class TicketServiceImpl implements TicketService {
   @Override
   public void updateTicketOfferDates(Long offerId, DateRange dateRange) {
     TicketOffer offer = this.get(offerId);
-    if (!dateRange.start().equals(offer.getStartDate())) {
+    if (!offer.getStartDate().equals(dateRange.start())) {
       validateSaleStartDate(dateRange.start(), offer.getMatch());
       offer.setStartDate(dateRange.start());
     }
-    if (!dateRange.end().equals(offer.getEndDate())) {
+    if (!offer.getEndDate().equals(dateRange.end())) {
       validateSaleEndDate(dateRange.start(), dateRange.end(), offer.getMatch());
       offer.setEndDate(dateRange.end());
     }
     ticketOfferRepository.save(offer);
+  }
+
+  @Override
+  @Transactional
+  public void updateTicketOfferPrice(Long offerId, List<StandPriceDTO> prices) {
+    for (StandPriceDTO standPrice : prices) {
+      TicketType ticketType =
+          ticketTypeRepository.findByTicketOfferIdAndStandId(offerId, standPrice.standId());
+      ticketType.setPrice(standPrice.price());
+      ticketTypeRepository.save(ticketType);
+    }
   }
 }

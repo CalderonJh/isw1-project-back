@@ -239,3 +239,6 @@ alter table app.ticket_offer
 alter table app.club_admin
     add constraint club_admin_pk
         unique (user_id, club_id);
+alter table app.ticket_type
+    add constraint ticket_type_pk
+        unique (ticket_offer_id, stand_id);

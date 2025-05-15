@@ -2,6 +2,7 @@ package fpc.app.controller;
 
 import fpc.app.constant.OfferStatus;
 import fpc.app.dto.request.CreateTicketOfferDTO;
+import fpc.app.dto.request.StandPriceDTO;
 import fpc.app.dto.response.TicketOfferResponseDTO;
 import fpc.app.dto.util.DateRange;
 import fpc.app.mapper.TicketMapper;
@@ -100,4 +101,14 @@ public class TicketManagementController {
     ticketService.updateTicketOfferDates(id, dateRange);
     return ResponseEntity.ok().build();
   }
+
+  @PutMapping("/{id}/update/price")
+  @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
+  @Operation(summary = "Update ticket offer price")
+  public ResponseEntity<Void> updateTicketOfferPrice(
+      @PathVariable Long id, @RequestBody @Valid List<StandPriceDTO> prices) {
+    ticketService.updateTicketOfferPrice(id, prices);
+    return ResponseEntity.ok().build();
+  }
+
 }
