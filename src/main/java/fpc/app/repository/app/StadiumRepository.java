@@ -12,4 +12,5 @@ public interface StadiumRepository extends JpaRepository<Stadium, Long> {
 
   @Query("select s.club.id from Stadium s where s.id = :stadiumId")
   Long getClubId(Long stadiumId);
+
 }

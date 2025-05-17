@@ -65,9 +65,13 @@ public class Tools {
   }
 
   public static void validateIsFutureDate(LocalDateTime date, String message) {
-    if (date.isBefore(getColTime())) {
+    if (!isFutureDate(date)) {
       throw new ValidationException(message);
     }
+  }
+
+  public static boolean isFutureDate(LocalDateTime date) {
+    return date.isAfter(getColTime());
   }
 
   public static void validateDateRange(LocalDateTime startDate, LocalDateTime endDate) {

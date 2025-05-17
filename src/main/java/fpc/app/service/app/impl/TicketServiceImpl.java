@@ -71,7 +71,7 @@ public class TicketServiceImpl implements TicketService {
     if (match.getStartDate() == null)
       throw new ValidationException("No se ha definido la fecha del partido");
     validateIsFutureDate(match.getStartDate(), "La fecha del partido debe ser futura");
-    if (ticketOfferRepository.existsMatchTicketOffer(match.getId(), getColTime()))
+    if (ticketOfferRepository.existsMatchTicketOffer(match.getId()))
       throw new ValidationException("Ya existe una oferta de tickets activa para este partido");
   }
 
@@ -114,8 +114,10 @@ public class TicketServiceImpl implements TicketService {
   }
 
   @Override
-  public List<TicketOffer> getActiveOffers(List<Long> clubIds) {
-    return ticketOfferRepository.getOffersByClubIdIn(clubIds);
+  public List<TicketOffer> getActiveOffers(List<Long> clubIds, boolean getAll) {
+    return getAll
+        ? ticketOfferRepository.getAllActive(getColTime())
+        : ticketOfferRepository.getOffersByClubIdIn(clubIds, getColTime());
   }
 
   @Override

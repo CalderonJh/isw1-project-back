@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import lombok.*;
 
@@ -22,9 +22,13 @@ public class SeasonPassOffer {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "posted_by", nullable = false)
-	private ClubAdmin postedBy;
+  @ManyToOne
+  @JoinColumn(name = "posted_by", nullable = false)
+  private ClubAdmin publisher;
+
+  @NotNull
+  @Column(name = "description", nullable = false)
+  private String description;
 
 	@NotNull
 	@Column(name = "year", nullable = false)
@@ -36,13 +40,13 @@ public class SeasonPassOffer {
 	@Max(2)
 	private Integer season;
 
-	@NotNull
-	@Column(name = "start_date", nullable = false)
-	private Date startDate;
+  @NotNull
+  @Column(name = "start_date", nullable = false)
+  private LocalDateTime startDate;
 
-	@NotNull
-	@Column(name = "end_date", nullable = false)
-	private Date endDate;
+  @NotNull
+  @Column(name = "end_date", nullable = false)
+  private LocalDateTime endDate;
 
 	@Nullable
 	@Column(name = "image_id")
@@ -56,6 +60,9 @@ public class SeasonPassOffer {
       inverseJoinColumns = @JoinColumn(name = "match_id"))
 	@Builder.Default
   private List<Match> matches = new ArrayList<>();
+
+  @Column(name = "paused")
+  private boolean isPaused;
 
   public void addMatch(Match match) {
     if (matches == null) {

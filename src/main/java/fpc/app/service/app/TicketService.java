@@ -19,7 +19,7 @@ public interface TicketService {
 
 	OfferStatus toggleTicketOfferStatus(Long ticketOfferId);
 
-	List<TicketOffer> getActiveOffers(List<Long> clubIds);
+	List<TicketOffer> getActiveOffers(List<Long> clubIds, boolean getAll);
 
 	List<TicketType> getTicketOfferTypes(@Positive Long ticketId);
 

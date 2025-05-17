@@ -19,9 +19,8 @@ public class SeasonPassType {
 	private Long id;
 
 	@NotNull
-	@ManyToOne
-	@JoinColumn(name = "season_pass_offer_id", nullable = false)
-	private SeasonPassOffer seasonPassOffer;
+	@Column(name = "season_pass_offer_id", nullable = false)
+	private Long seasonPassOfferId;
 
 	@NotNull
 	@ManyToOne
