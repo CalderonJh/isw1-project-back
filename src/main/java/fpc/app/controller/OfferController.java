@@ -18,6 +18,7 @@ import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -80,5 +81,24 @@ public class OfferController {
       @PathVariable @Positive Long seasonPassId) {
     SeasonPassOfferDetailDTO offerTypes = seasonPassOfferService.getSeasonPassTypes(seasonPassId);
     return ResponseEntity.ok(offerTypes);
+  }
+
+  @PostMapping("/purchase/{saleId}")
+  @Operation(summary = "Purchase a offer")
+  @Parameter(name = "type", description = "Type of offer to purchase, values: ticket, pass")
+  @Parameter(name = "saleId", description = "ID of the offer type to purchase (price by stand)")
+  public ResponseEntity<Void> purchase(
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+      @PathVariable("saleId") @Positive Long offerId,
+      @RequestParam
+          @Pattern(regexp = "^(ticket|pass)$", message = "Invalid type, must be ticket or pass")
+          String type) {
+    User user = userService.getUser(jwtUtil.getUserId(token));
+    switch (type) {
+      case "ticket" -> ticketService.purchase(offerId, user);
+      case "pass" -> seasonPassOfferService.purchase(offerId, user);
+      default -> throw new IllegalArgumentException("Invalid offer type");
+    }
+    return ResponseEntity.ok().build();
   }
 }

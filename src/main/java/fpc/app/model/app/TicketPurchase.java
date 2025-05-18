@@ -25,10 +25,9 @@ public class TicketPurchase {
 	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
+	private User buyer;
 
-	@NotNull
-	@Column(name = "payment_id", nullable = false)
+	@Column(name = "payment_id")
 	private String paymentId;
 
 }

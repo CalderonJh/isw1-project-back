@@ -11,6 +11,7 @@ import fpc.app.exception.ValidationException;
 import fpc.app.model.app.*;
 import fpc.app.model.auth.User;
 import fpc.app.repository.app.TicketOfferRepository;
+import fpc.app.repository.app.TicketPurchaseRepository;
 import fpc.app.repository.app.TicketTypeRepository;
 import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.MatchService;
@@ -32,6 +33,7 @@ public class TicketServiceImpl implements TicketService {
   private final CloudinaryService cloudinaryService;
   private final ClubAdminService clubAdminService;
   private final TicketTypeRepository ticketTypeRepository;
+  private final TicketPurchaseRepository ticketPurchaseRepository;
 
   @Override
   @Transactional
@@ -103,13 +105,13 @@ public class TicketServiceImpl implements TicketService {
 
   @Override
   public OfferStatus toggleTicketOfferStatus(Long ticketOfferId) {
-    TicketOffer offer = this.get(ticketOfferId);
+    TicketOffer offer = this.getTicketOffer(ticketOfferId);
     offer.setPaused(!offer.isPaused());
     ticketOfferRepository.save(offer);
     return OfferStatus.get(offer.isPaused());
   }
 
-  public TicketOffer get(Long ticketOfferId) {
+  public TicketOffer getTicketOffer(Long ticketOfferId) {
     return ticketOfferRepository.findById(ticketOfferId).orElseThrow(DataNotFoundException::new);
   }
 
@@ -144,7 +146,7 @@ public class TicketServiceImpl implements TicketService {
   @Override
   @Transactional
   public void updateTicketOfferImage(Long offerId, MultipartFile image) {
-    TicketOffer offer = this.get(offerId);
+    TicketOffer offer = this.getTicketOffer(offerId);
     if (offer.getImageId() != null) cloudinaryService.deleteImage(offer.getImageId());
 
     String imageId = cloudinaryService.uploadImage(image);
@@ -154,7 +156,7 @@ public class TicketServiceImpl implements TicketService {
 
   @Override
   public void updateTicketOfferDates(Long offerId, DateRange dateRange) {
-    TicketOffer offer = this.get(offerId);
+    TicketOffer offer = this.getTicketOffer(offerId);
     if (!offer.getStartDate().equals(dateRange.start())) {
       validateSaleStartDate(dateRange.start(), offer.getMatch());
       offer.setStartDate(dateRange.start());
@@ -176,4 +178,12 @@ public class TicketServiceImpl implements TicketService {
       ticketTypeRepository.save(ticketType);
     }
   }
+
+  @Override
+  public void purchase(Long ticketTypeId, User buyer) {
+    TicketType type = ticketTypeRepository.findById(ticketTypeId).orElseThrow(DataNotFoundException::new);
+    getTicketOffer(type.getTicketOfferId()).validateForSale();
+    ticketPurchaseRepository.save(TicketPurchase.builder().ticketType(type).buyer(buyer).build());
+  }
+
 }

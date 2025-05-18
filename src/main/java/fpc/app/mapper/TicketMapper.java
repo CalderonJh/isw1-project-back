@@ -1,7 +1,7 @@
 package fpc.app.mapper;
 
-import fpc.app.dto.response.TicketOfferResponseDTO;
 import fpc.app.dto.response.StandPricingDTO;
+import fpc.app.dto.response.TicketOfferResponseDTO;
 import fpc.app.dto.util.Suggestion;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.TicketOffer;
@@ -27,7 +27,11 @@ public class TicketMapper {
   }
 
   public static StandPricingDTO toTicketTypeDTO(TicketType ticketType) {
-    return new StandPricingDTO(ticketType.getStand().getName(), ticketType.getPrice(), ticketType.isAvailable());
+    return new StandPricingDTO(
+        ticketType.getId(),
+        ticketType.getStand().getName(),
+        ticketType.getPrice(),
+        ticketType.isAvailable());
   }
 
   public static List<StandPricingDTO> toTicketTypeDTO(List<TicketType> ticketTypes) {

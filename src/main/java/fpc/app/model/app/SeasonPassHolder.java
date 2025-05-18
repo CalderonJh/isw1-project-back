@@ -2,7 +2,6 @@ package fpc.app.model.app;
 
 import fpc.app.model.auth.User;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -28,7 +27,6 @@ public class SeasonPassHolder {
 	@JoinColumn(name = "season_pass_type_id", nullable = false)
 	private SeasonPassType seasonPassType;
 
-	@NotBlank
-	@Column(name = "payment_id", nullable = false)
-	private String paymentId;
+  @Column(name = "payment_id")
+  private String paymentId;
 }

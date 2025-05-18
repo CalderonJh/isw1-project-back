@@ -7,7 +7,6 @@ import fpc.app.model.app.Club;
 import fpc.app.model.app.IdentityDocument;
 import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.auth.UserService;
-import fpc.app.util.Tools;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +30,8 @@ public class PublicController {
   @Operation(summary = "Get all identity document types")
   public ResponseEntity<List<Suggestion>> suggestDocTypes() {
     List<IdentityDocument> suggestions = userService.getIdentityDocumentTypes();
-    return ResponseEntity.ok(suggestions.stream().map(Tools::mapSuggestion).toList());
+    return ResponseEntity.ok(
+        suggestions.stream().map(d -> new Suggestion(d.getId(), d.getDescription())).toList());
   }
 
   @GetMapping("/club/list")

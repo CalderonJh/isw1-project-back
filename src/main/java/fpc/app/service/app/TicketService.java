@@ -30,4 +30,6 @@ public interface TicketService {
 	void updateTicketOfferDates(Long offerId, DateRange dateRange);
 
 	void updateTicketOfferPrice(Long offerId, List<StandPriceDTO> prices);
+
+	void purchase(Long ticketTypeId, User buyer);
 }

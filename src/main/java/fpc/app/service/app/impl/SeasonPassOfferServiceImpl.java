@@ -11,7 +11,9 @@ import fpc.app.exception.DataNotFoundException;
 import fpc.app.exception.ValidationException;
 import fpc.app.mapper.SeasonPassOfferMapper;
 import fpc.app.model.app.*;
+import fpc.app.model.auth.User;
 import fpc.app.repository.app.MatchRepository;
+import fpc.app.repository.app.SeasonPassHolderRepository;
 import fpc.app.repository.app.SeasonPassOfferRepository;
 import fpc.app.repository.app.SeasonPassTypeRepository;
 import fpc.app.service.app.SeasonPassOfferService;
@@ -31,6 +33,7 @@ public class SeasonPassOfferServiceImpl implements SeasonPassOfferService {
   private final MatchRepository matchRepository;
   private final CloudinaryService cloudinaryService;
   private final SeasonPassTypeRepository seasonPassTypeRepository;
+  private final SeasonPassHolderRepository seasonPassHolderRepository;
 
   @Override
   @Transactional
@@ -115,5 +118,13 @@ public class SeasonPassOfferServiceImpl implements SeasonPassOfferService {
     return seasonPassOfferRepository
         .findById(seasonPassOfferId)
         .orElseThrow(() -> new DataNotFoundException("No se encontró la oferta de abono"));
+  }
+
+  @Override
+  public void purchase(Long seasonPassTypeId, User buyer) {
+    SeasonPassType type = seasonPassTypeRepository.findById(seasonPassTypeId).orElseThrow(DataNotFoundException::new);
+    this.getSeasonPassOffer(type.getSeasonPassOfferId()).validateForSale();
+    seasonPassHolderRepository.save(
+        SeasonPassHolder.builder().seasonPassType(type).user(buyer).build());
   }
 }

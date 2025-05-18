@@ -11,7 +11,7 @@ public interface TicketOfferRepository extends JpaRepository<TicketOffer, Long> 
   Long getClubId(Long offerId);
 
   @Query(
-      "select o from TicketOffer o where o.publisher.club.id in :clubIds and o.paused = false  and o.startDate <= :now and o.endDate >= :now")
+      "select o from TicketOffer o where o.publisher.club.id in :clubIds and o.isPaused = false  and o.startDate <= :now and o.endDate >= :now")
   List<TicketOffer> getOffersByClubIdIn(List<Long> clubIds, LocalDateTime now);
 
   @Query("select count(o.id) > 0 from TicketOffer o where o.match.id = :matchId")
@@ -21,6 +21,6 @@ public interface TicketOfferRepository extends JpaRepository<TicketOffer, Long> 
   List<TicketOffer> findByClubId(Long clubId);
 
   @Query(
-      "select o from TicketOffer o where o.paused = false and o.startDate <= :now and o.endDate >= :now")
+      "select o from TicketOffer o where o.isPaused = false and o.startDate <= :now and o.endDate >= :now")
   List<TicketOffer> getAllActive(LocalDateTime now);
 }
