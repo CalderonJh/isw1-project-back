@@ -245,3 +245,22 @@ alter table app.ticket_type
         unique (ticket_offer_id, stand_id);
 alter table app.season_pass_offer
     add paused bool default false;
+
+create view app.ticket_type_purchases as
+SELECT t.id                       as ticket_type_id,
+       COUNT(p.id)                AS purchases,
+       s.capacity                 AS stand_capacity,
+       (s.capacity > COUNT(p.id)) AS available_ticket
+FROM app.ticket_type t
+         JOIN app.stand s ON t.stand_id = s.id
+         LEFT JOIN app.ticket_purchase p ON p.ticket_type_id = t.id
+GROUP BY t.id, s.capacity;
+create view app.season_pass_purchases as
+SELECT sp.id                      as season_pass_type_id,
+       COUNT(p.id)                AS purchases,
+       s.capacity                 AS stand_capacity,
+       (s.capacity > COUNT(p.id)) AS available_ticket
+FROM app.season_pass_type sp
+         JOIN app.stand s ON sp.stand_id = s.id
+         LEFT JOIN app.ticket_purchase p ON p.ticket_type_id = sp.id
+GROUP BY sp.id, s.capacity;

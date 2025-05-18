@@ -2,4 +2,4 @@ package fpc.app.dto.response;
 
 import java.math.BigDecimal;
 
-public record StandPricingDTO(String standName, BigDecimal price) {}
+public record StandPricingDTO(String standName, BigDecimal price, boolean available) {}

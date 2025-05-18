@@ -34,7 +34,8 @@ public class SeasonPassOfferMapper {
   }
 
   private static StandPricingDTO mapToStandPricingDTO(SeasonPassType passType) {
-    return new StandPricingDTO(passType.getStand().getName(), passType.getPrice());
+    return new StandPricingDTO(
+        passType.getStand().getName(), passType.getPrice(), passType.isAvailable());
   }
 
   private static String getAwayTeamName(Match match) {

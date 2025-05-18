@@ -27,7 +27,7 @@ public class TicketMapper {
   }
 
   public static StandPricingDTO toTicketTypeDTO(TicketType ticketType) {
-    return new StandPricingDTO(ticketType.getStand().getName(), ticketType.getPrice());
+    return new StandPricingDTO(ticketType.getStand().getName(), ticketType.getPrice(), ticketType.isAvailable());
   }
 
   public static List<StandPricingDTO> toTicketTypeDTO(List<TicketType> ticketTypes) {

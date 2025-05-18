@@ -99,7 +99,15 @@ public class SeasonPassOfferServiceImpl implements SeasonPassOfferService {
   public SeasonPassOfferDetailDTO getSeasonPassTypes(Long seasonPassOfferId) {
     SeasonPassOffer offer = getSeasonPassOffer(seasonPassOfferId);
     List<SeasonPassType> types =  seasonPassTypeRepository.getSeasonPassTypes(offer.getId());
+    setStandAvailability(types);
     return SeasonPassOfferMapper.toDetailDTO(types, offer);
+  }
+
+  private void setStandAvailability(List<SeasonPassType> types) {
+    for (SeasonPassType type : types) {
+      Boolean available = seasonPassTypeRepository.isAvailable(type.getId());
+      type.setAvailable(Boolean.TRUE.equals(available));
+    }
   }
 
   @Override

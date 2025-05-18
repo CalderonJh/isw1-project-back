@@ -29,4 +29,6 @@ public class TicketType {
 	@NotNull
 	@Column(name = "price", nullable = false)
 	private BigDecimal price;
+
+	@Transient boolean available;
 }

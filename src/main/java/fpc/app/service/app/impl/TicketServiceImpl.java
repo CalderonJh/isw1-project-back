@@ -127,7 +127,18 @@ public class TicketServiceImpl implements TicketService {
 
   @Override
   public List<TicketType> getTicketOfferTypes(Long ticketId) {
-    return ticketTypeRepository.findByTicketOfferId(ticketId);
+    if (!ticketOfferRepository.existsById(ticketId))
+      throw new DataNotFoundException("No se encontró la oferta de tickets");
+    var types = ticketTypeRepository.findByTicketOfferId(ticketId);
+    setStandAvailability(types);
+    return types;
+  }
+
+  private void setStandAvailability(List<TicketType> types) {
+    for (TicketType type : types) {
+      Boolean available = ticketTypeRepository.isAvailable(type.getId());
+      type.setAvailable(Boolean.TRUE.equals(available));
+    }
   }
 
   @Override

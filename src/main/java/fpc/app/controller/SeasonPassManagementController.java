@@ -9,6 +9,7 @@ import fpc.app.service.app.SeasonPassOfferService;
 import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/club-admin/season-pass")
+@Tag(name = "Season Pass Management")
 public class SeasonPassManagementController {
 
   private final UserService userService;

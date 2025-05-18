@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorDetails> handleResourceNotFoundException(DataNotFoundException ex) {
     log.error("Object or resource not found: {}", ex.getMessage());
     ErrorDetails errorDetails =
-        new ErrorDetails(LocalDateTime.now(), "No se enc ontró el recurso", ex.getMessage());
+        new ErrorDetails(LocalDateTime.now(), "No se encontró el recurso", ex.getMessage());
     return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
   }
 
