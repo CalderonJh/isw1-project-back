@@ -68,6 +68,7 @@ public class ClubPermissionEvaluator implements PermissionEvaluator {
       case "Match" -> clubId.equals(matchRepository.getHomeClubId(recordId));
       case "Stadium" -> clubId.equals(stadiumRepository.getClubId(recordId));
       case "TicketOffer" -> clubId.equals(ticketOfferRepository.getClubId(recordId));
+      case "SeasonPassOffer" -> clubId.equals(ticketOfferRepository.getClubId(recordId));
       default -> false;
     };
   }

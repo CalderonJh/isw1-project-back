@@ -19,11 +19,6 @@ import lombok.experimental.SuperBuilder;
 @MappedSuperclass
 public abstract class Offer {
   @NotNull
-  @ManyToOne
-  @JoinColumn(name = "posted_by", nullable = false)
-  private ClubAdmin publisher;
-
-  @NotNull
   @Column(name = "start_date", nullable = false)
   private LocalDateTime startDate;
 
@@ -49,5 +44,18 @@ public abstract class Offer {
     if (startDate.isAfter(now)) return false;
     if (endDate == null) return true;
     return !endDate.isBefore(now);
+  }
+
+  public void validateDateRange() {
+    LocalDateTime now = getColTime();
+    if (startDate.isAfter(endDate))
+      throw new ValidationException("La fecha de inicio no puede ser posterior a la fecha de fin");
+    if (startDate.isBefore(now))
+      throw new ValidationException("La fecha de inicio debe ser futura");
+  }
+
+  public void validateEndDate() {
+    if (endDate.isBefore(getColTime()))
+      throw new ValidationException("La fecha de fin no puede ser anterior a la fecha actual");
   }
 }

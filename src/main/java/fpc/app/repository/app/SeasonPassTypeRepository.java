@@ -14,4 +14,6 @@ public interface SeasonPassTypeRepository extends JpaRepository<SeasonPassType, 
       value =
           "select v.available_ticket from app.season_pass_purchases v where v.season_pass_type_id = :seasonPassTypeId")
   Boolean isAvailable(Long seasonPassTypeId);
+
+  SeasonPassType findBySeasonPassOfferIdAndStandId(Long id, Long standId);
 }

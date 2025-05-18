@@ -22,6 +22,11 @@ public class SeasonPassOffer extends Offer {
 	private Long id;
 
   @NotNull
+  @ManyToOne
+  @JoinColumn(name = "posted_by", nullable = false)
+  private ClubAdmin publisher;
+
+  @NotNull
   @Column(name = "description", nullable = false)
   private String description;
 

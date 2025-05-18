@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -67,7 +68,6 @@ public class TicketManagementController {
   }
 
   @PutMapping("/{id}/toggle-status")
-  @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
   @ApiResponse(
       responseCode = "200",
       description = "Nuevo estado de la oferta",
@@ -75,6 +75,7 @@ public class TicketManagementController {
           @Content(
               mediaType = "application/json",
               examples = @ExampleObject(value = "{\"status\": \"ENABLED\"}")))
+  @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
   @Operation(summary = "Toggle ticket offer status")
   public ResponseEntity<Map<String, OfferStatus>> changeTicketOfferStatus(@PathVariable Long id) {
     OfferStatus status = ticketService.toggleTicketOfferStatus(id);
@@ -106,7 +107,7 @@ public class TicketManagementController {
   @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
   @Operation(summary = "Update ticket offer price")
   public ResponseEntity<Void> updateTicketOfferPrice(
-      @PathVariable Long id, @RequestBody @Valid List<StandPriceDTO> prices) {
+      @PathVariable Long id, @RequestBody @Valid Set<StandPriceDTO> prices) {
     ticketService.updateTicketOfferPrice(id, prices);
     return ResponseEntity.ok().build();
   }

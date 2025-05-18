@@ -3,6 +3,8 @@ package fpc.app.mapper;
 import fpc.app.dto.response.SeasonPassOfferDetailDTO;
 import fpc.app.dto.response.SeasonPassOfferResponseDTO;
 import fpc.app.dto.response.StandPricingDTO;
+import fpc.app.dto.util.DateRange;
+import fpc.app.dto.util.Reference;
 import fpc.app.model.app.Match;
 import fpc.app.model.app.SeasonPassOffer;
 import fpc.app.model.app.SeasonPassType;
@@ -13,11 +15,13 @@ public class SeasonPassOfferMapper {
 
   public static SeasonPassOfferResponseDTO toResponseDTO(SeasonPassOffer offer) {
     return SeasonPassOfferResponseDTO.builder()
+        .id(offer.getId())
         .description(offer.getDescription())
         .year(offer.getYear())
         .season(offer.getSeason())
-        .endDate(offer.getEndDate())
+        .offerPeriod(new DateRange(offer.getStartDate(), offer.getEndDate()))
         .imageId(offer.getImageId())
+        .isPaused(offer.isPaused())
         .build();
   }
 
@@ -36,7 +40,7 @@ public class SeasonPassOfferMapper {
   private static StandPricingDTO mapToStandPricingDTO(SeasonPassType passType) {
     return new StandPricingDTO(
         passType.getId(),
-        passType.getStand().getName(),
+        new Reference(passType.getStand().getId(), passType.getStand().getName()),
         passType.getPrice(),
         passType.isAvailable());
   }

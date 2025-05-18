@@ -1,7 +1,14 @@
 package fpc.app.controller;
 
+import fpc.app.constant.OfferStatus;
 import fpc.app.dto.request.CreateSeasonPassOfferDTO;
+import fpc.app.dto.request.StandPriceDTO;
+import fpc.app.dto.response.SeasonPassOfferResponseDTO;
+import fpc.app.dto.util.DateRange;
+import fpc.app.mapper.SeasonPassOfferMapper;
+import fpc.app.model.app.Club;
 import fpc.app.model.app.ClubAdmin;
+import fpc.app.model.app.SeasonPassOffer;
 import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
 import fpc.app.service.app.ClubAdminService;
@@ -9,10 +16,18 @@ import fpc.app.service.app.SeasonPassOfferService;
 import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,6 +63,60 @@ public class SeasonPassManagementController {
     User user = userService.getUser(jwtUtil.getUserId(token));
     ClubAdmin clubAdmin = clubAdminService.getClubAdmin(user);
     seasonPassOfferService.createSeasonPassOffer(clubAdmin, dto, image);
+    return ResponseEntity.ok().build();
+  }
+
+  @GetMapping("/all")
+  @Operation(summary = "Get all season pass offers of the current club")
+  public ResponseEntity<List<SeasonPassOfferResponseDTO>> getAll(
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+    User user = userService.getUser(jwtUtil.getUserId(token));
+    Club club = clubAdminService.getClub(user);
+    List<SeasonPassOffer> offers = seasonPassOfferService.getAllSeasonPassOffers(club);
+    return ResponseEntity.ok(SeasonPassOfferMapper.toResponseDTO(offers));
+  }
+
+  @ApiResponse(
+      responseCode = "200",
+      description = "Nuevo estado de la oferta",
+      content =
+          @Content(
+              mediaType = "application/json",
+              examples = @ExampleObject(value = "{\"status\": \"ENABLED\"}")))
+  @PutMapping("/{offerId}/toggle-status")
+  @Operation(summary = "Toggle season pass offer status")
+  @PreAuthorize("hasPermission(#offerId, 'SeasonPassOffer', 'ANY')")
+  public ResponseEntity<Map<String, OfferStatus>> toggleStatus(@PathVariable Long offerId) {
+    OfferStatus status = seasonPassOfferService.toggleSeasonPassOfferStatus(offerId);
+    Map<String, OfferStatus> map = Map.of("status", status);
+    return ResponseEntity.ok(map);
+  }
+
+  @PutMapping(
+      value = "/{id}/update/image",
+      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @Operation(summary = "Update season pass offer image")
+  @PreAuthorize("hasPermission(#id, 'SeasonPassOffer', 'ANY')")
+  public ResponseEntity<Void> updateImage(
+      @PathVariable Long id, @RequestPart("file") MultipartFile file) {
+    seasonPassOfferService.updateSeasonPassOfferImage(id, file);
+    return ResponseEntity.ok().build();
+  }
+
+  @PutMapping("/{id}/update/dates")
+  @Operation(summary = "Update season pass offer dates")
+  @PreAuthorize("hasPermission(#id, 'SeasonPassOffer', 'ANY')")
+  public ResponseEntity<Void> updateDate(@PathVariable Long id, @RequestBody DateRange dates) {
+    seasonPassOfferService.updateDates(id, dates);
+    return ResponseEntity.ok().build();
+  }
+
+  @PutMapping("/{id}/update/price")
+  @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
+  @Operation(summary = "Update ticket offer price")
+  public ResponseEntity<Void> updateTicketOfferPrice(
+      @PathVariable Long id, @RequestBody @Valid Set<StandPriceDTO> prices) {
+    seasonPassOfferService.updateSeasonPassOfferPrice(id, prices);
     return ResponseEntity.ok().build();
   }
 }

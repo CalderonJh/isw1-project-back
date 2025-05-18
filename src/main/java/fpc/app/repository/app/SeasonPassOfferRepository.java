@@ -7,10 +7,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface SeasonPassOfferRepository extends JpaRepository<SeasonPassOffer, Long> {
+  @Query("select o.publisher.club.id from SeasonPassOffer o where o.id = :offerId")
+  Long getClubId(Long offerId);
+
   @Query(
       "select o from SeasonPassOffer o where o.isPaused = false and o.startDate <= :colTime and o.endDate >= :colTime")
   List<SeasonPassOffer> findAllActiveByClubIdIn(List<Long> clubIds, LocalDateTime colTime);
 
   @Query("select o from SeasonPassOffer o where o.isPaused = false and o.startDate <= :colTime and o.endDate >= :colTime")
   List<SeasonPassOffer> findAllActive(LocalDateTime colTime);
+
+  List<SeasonPassOffer> findAllByPublisherClubId(Long clubId);
 }

@@ -9,6 +9,7 @@ import fpc.app.model.app.TicketOffer;
 import fpc.app.model.app.TicketType;
 import fpc.app.model.auth.User;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.validation.constraints.Positive;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,7 +30,7 @@ public interface TicketService {
 
 	void updateTicketOfferDates(Long offerId, DateRange dateRange);
 
-	void updateTicketOfferPrice(Long offerId, List<StandPriceDTO> prices);
+	void updateTicketOfferPrice(Long offerId, Set<StandPriceDTO> prices);
 
 	void purchase(Long ticketTypeId, User buyer);
 }

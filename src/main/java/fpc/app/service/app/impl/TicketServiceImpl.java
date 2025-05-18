@@ -20,6 +20,7 @@ import fpc.app.service.util.CloudinaryService;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -170,7 +171,7 @@ public class TicketServiceImpl implements TicketService {
 
   @Override
   @Transactional
-  public void updateTicketOfferPrice(Long offerId, List<StandPriceDTO> prices) {
+  public void updateTicketOfferPrice(Long offerId, Set<StandPriceDTO> prices) {
     for (StandPriceDTO standPrice : prices) {
       TicketType ticketType =
           ticketTypeRepository.findByTicketOfferIdAndStandId(offerId, standPrice.standId());

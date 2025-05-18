@@ -1,8 +1,14 @@
 package fpc.app.dto.response;
 
-import java.time.LocalDateTime;
+import fpc.app.dto.util.DateRange;
 import lombok.Builder;
 
 @Builder
 public record SeasonPassOfferResponseDTO(
-    String description, Integer year, Integer season, LocalDateTime endDate, String imageId) {}
+    Long id,
+    String description,
+    Integer year,
+    Integer season,
+    DateRange offerPeriod,
+    String imageId,
+    boolean isPaused) {}

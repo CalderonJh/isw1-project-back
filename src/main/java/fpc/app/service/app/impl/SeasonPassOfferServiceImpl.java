@@ -4,9 +4,11 @@ import static fpc.app.util.Tools.getColTime;
 import static fpc.app.util.Tools.isFutureDate;
 import static java.util.Objects.isNull;
 
+import fpc.app.constant.OfferStatus;
 import fpc.app.dto.request.CreateSeasonPassOfferDTO;
 import fpc.app.dto.request.StandPriceDTO;
 import fpc.app.dto.response.SeasonPassOfferDetailDTO;
+import fpc.app.dto.util.DateRange;
 import fpc.app.exception.DataNotFoundException;
 import fpc.app.exception.ValidationException;
 import fpc.app.mapper.SeasonPassOfferMapper;
@@ -43,24 +45,26 @@ public class SeasonPassOfferServiceImpl implements SeasonPassOfferService {
     validateGames(clubAdmin.getClub().getId(), matches);
     validateStands(dto.standPrices(), matches.getFirst().getStadium());
     String imageId = image == null ? null : cloudinaryService.uploadImage(image);
-    SeasonPassOffer offer =
-        seasonPassOfferRepository.save(
-            SeasonPassOffer.builder()
-                .publisher(clubAdmin)
-                .description(dto.description())
-                .season(dto.season())
-                .year(dto.year())
-                .startDate(dto.startDate())
-                .endDate(dto.endDate())
-                .imageId(imageId)
-                .matches(matches)
-                .build());
+    SeasonPassOffer toSave =
+        SeasonPassOffer.builder()
+            .publisher(clubAdmin)
+            .description(dto.description())
+            .season(dto.season())
+            .year(dto.year())
+            .startDate(dto.startDate())
+            .endDate(dto.endDate())
+            .imageId(imageId)
+            .matches(matches)
+            .build();
+    toSave.validateDateRange();
+    SeasonPassOffer saved = seasonPassOfferRepository.save(toSave);
+
     dto.standPrices()
         .forEach(
             sp ->
                 seasonPassTypeRepository.save(
                     SeasonPassType.builder()
-                        .seasonPassOfferId(offer.getId())
+                        .seasonPassOfferId(saved.getId())
                         .price(sp.price())
                         .stand(new Stand(sp.standId()))
                         .build()));
@@ -126,5 +130,54 @@ public class SeasonPassOfferServiceImpl implements SeasonPassOfferService {
     this.getSeasonPassOffer(type.getSeasonPassOfferId()).validateForSale();
     seasonPassHolderRepository.save(
         SeasonPassHolder.builder().seasonPassType(type).user(buyer).build());
+  }
+
+  @Override
+  public List<SeasonPassOffer> getAllSeasonPassOffers(Club club) {
+    return seasonPassOfferRepository.findAllByPublisherClubId(club.getId());
+  }
+
+  @Override
+  public OfferStatus toggleSeasonPassOfferStatus(Long offerId) {
+    SeasonPassOffer offer = getSeasonPassOffer(offerId);
+    offer.setPaused(!offer.isPaused());
+    seasonPassOfferRepository.save(offer);
+    return OfferStatus.get(offer.isPaused());
+  }
+
+  @Override
+  @Transactional
+  public void updateSeasonPassOfferImage(Long id, MultipartFile file) {
+    SeasonPassOffer offer = getSeasonPassOffer(id);
+    if (offer.getImageId() != null) cloudinaryService.deleteImage(offer.getImageId());
+    String imageId = cloudinaryService.uploadImage(file);
+    offer.setImageId(imageId);
+    seasonPassOfferRepository.save(offer);
+  }
+
+  @Override
+  public void updateDates(Long offerId, DateRange dateRange) {
+    SeasonPassOffer offer = getSeasonPassOffer(offerId);
+    dateRange.validate();
+    if (!offer.getStartDate().equals(dateRange.start())) {
+      offer.setStartDate(dateRange.start());
+      offer.validateDateRange();
+    }
+    if (!offer.getEndDate().equals(dateRange.end())) {
+      offer.setStartDate(dateRange.start());
+      offer.validateEndDate();
+    }
+    seasonPassOfferRepository.save(offer);
+  }
+
+  @Override
+  @Transactional
+  public void updateSeasonPassOfferPrice(Long id, Set<StandPriceDTO> prices) {
+    for (StandPriceDTO price : prices) {
+      SeasonPassType seasonPassType =
+          seasonPassTypeRepository.findBySeasonPassOfferIdAndStandId(id, price.standId());
+      seasonPassType.setPrice(price.price());
+      seasonPassTypeRepository.save(seasonPassType);
+    }
   }
 }
