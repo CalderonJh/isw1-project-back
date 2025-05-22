@@ -63,7 +63,7 @@ public class UserController {
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestParam Long clubId) {
     User user = userService.getUser(jwtUtil.getUserId(token));
-    Club club = clubService.getClub(clubId);
+    Club club = clubService.getClubById(clubId);
     subscriptionService.subscribe(user, club);
     return ResponseEntity.ok().build();
   }

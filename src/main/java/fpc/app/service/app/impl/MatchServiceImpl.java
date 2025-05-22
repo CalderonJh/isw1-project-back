@@ -17,6 +17,7 @@ import fpc.app.service.app.StadiumService;
 import jakarta.validation.constraints.Future;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class MatchServiceImpl implements MatchService {
   public Match create(Club homeClub, MatchCreationDTO dto) {
     validateAwayClub(homeClub, dto.awayClubId());
     Stadium stadium = stadiumService.getStadium(dto.stadiumId());
-    Club awayClub = clubService.getClub(dto.awayClubId());
+    Club awayClub = clubService.getClubById(dto.awayClubId());
     validateMatchDay(homeClub.getId(), dto.matchDate());
     Match toSave =
         Match.builder()
@@ -60,8 +61,9 @@ public class MatchServiceImpl implements MatchService {
     return matchRepository.save(toSave);
   }
 
-  private void validateMatchDay(Long clubId, @Future LocalDateTime localDateTime) {
-    LocalDateTime start = localDateTime.toLocalDate().atStartOfDay();
+  private void validateMatchDay(Long clubId, @Future LocalDateTime matchDay) {
+    if (matchDay == null) return;
+    LocalDateTime start = matchDay.toLocalDate().atStartOfDay();
     LocalDateTime end = start.plusDays(1);
     if (matchRepository.existsByDay(clubId, start, end))
       throw new ValidationException("Ya existe un partido para ese día");
@@ -75,7 +77,7 @@ public class MatchServiceImpl implements MatchService {
 
   @Override
   public void update(Long matchId, MatchCreationDTO dto) {
-    Match match = getMatch(dto.matchId());
+    Match match = getMatch(matchId);
     Club club = match.getHomeClub();
     if (dto.stadiumId().equals(match.getStadium().getId())) {
       Stadium stadium = stadiumService.getStadium(dto.stadiumId());
@@ -84,12 +86,15 @@ public class MatchServiceImpl implements MatchService {
     
     if (!dto.awayClubId().equals(match.getAwayClub().getId())) {
       validateAwayClub(club, dto.awayClubId());
-      match.setAwayClub(clubService.getClub(dto.awayClubId()));
+      match.setAwayClub(clubService.getClubById(dto.awayClubId()));
     }
     
     match.setSeason(dto.season());
     match.setYear(dto.year());
-    match.setStartDate(dto.matchDate());
+    if (!Objects.equals(match.getStartDate(), dto.matchDate())) {
+      validateMatchDay(club.getId(), dto.matchDate());
+      match.setStartDate(dto.matchDate());
+    }
     matchRepository.save(match);
   }
 

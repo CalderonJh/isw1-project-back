@@ -1,17 +1,17 @@
 package fpc.app.dto.response;
 
-import java.time.LocalDateTime;
-
 import fpc.app.dto.util.DateRange;
-import fpc.app.dto.util.Suggestion;
+import fpc.app.dto.util.Reference;
+import java.time.LocalDateTime;
 import lombok.Builder;
 
 @Builder
 public record TicketOfferResponseDTO(
     Long id,
-    Suggestion homeClub,
-    Suggestion awayClub,
+    Reference homeClub,
+    Reference awayClub,
+    Reference stadium,
     LocalDateTime matchDay,
-		DateRange offerPeriod,
+    DateRange offerPeriod,
     String imageId,
     boolean isPaused) {}

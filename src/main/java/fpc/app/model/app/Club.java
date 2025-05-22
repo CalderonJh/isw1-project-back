@@ -1,6 +1,7 @@
 package fpc.app.model.app;
 
-
+import fpc.app.dto.util.Reference;
+import fpc.app.model.auth.User;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -29,4 +30,13 @@ public class Club {
   @NotBlank
   @Column(name = "short_name", length = 50, unique = true)
   private String shortName;
+
+  @Nullable
+  @OneToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "admin_id", unique = true)
+  private User admin;
+
+  public Reference getReference() {
+    return new Reference(id, name);
+  }
 }

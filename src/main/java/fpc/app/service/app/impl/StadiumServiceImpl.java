@@ -55,8 +55,12 @@ public class StadiumServiceImpl implements StadiumService {
     String name = removeExtraSpaces(dto.name());
     if (!equalsText(stadium.getName(), name)) validateStadiumName(dto.name(), stadium.getClub());
     stadium.setName(name);
-    stadium.clearStands();
-    addStands(stadium, dto.stands());
+
+    for (StandDTO stand : dto.stands()) {
+      Stand existingStand = stadium.getStand(stand.name());
+      if (existingStand == null) stadium.addStand(new Stand(stand.name(), stand.capacity()));
+      else existingStand.setCapacity(stand.capacity());
+    }
     stadiumRepository.save(stadium);
   }
 

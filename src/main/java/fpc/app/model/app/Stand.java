@@ -1,5 +1,6 @@
 package fpc.app.model.app;
 
+import fpc.app.dto.util.Reference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,5 +33,9 @@ public class Stand {
 
 	public Stand(Long id) {
 		this.id = id;
+	}
+
+	public Reference getReference() {
+		return new Reference(id, name);
 	}
 }

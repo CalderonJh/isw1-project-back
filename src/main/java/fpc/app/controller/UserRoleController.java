@@ -2,14 +2,18 @@ package fpc.app.controller;
 
 import static fpc.app.util.Tools.mapSuggestion;
 
+import fpc.app.dto.response.UserRoleDTO;
 import fpc.app.dto.util.Suggestion;
+import fpc.app.security.JwtUtil;
 import fpc.app.service.auth.UserRoleService;
 import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +25,18 @@ import org.springframework.web.bind.annotation.*;
 public class UserRoleController {
   private final UserRoleService userRoleService;
   private final UserService userService;
+  private final JwtUtil jwtUtil;
+
+  @GetMapping("/user-role")
+  @Operation(summary = "Get user roles info, if not provided, uses the current user ID")
+  @Parameter(name = "userId", description = "ID of the user to get roles for")
+  public ResponseEntity<UserRoleDTO> getUserRoles(
+      @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+      @Positive Long userId) {
+    if (userId == null) userId = jwtUtil.getUserId(token);
+    UserRoleDTO userRoles = userRoleService.getUserRoles(userId);
+    return ResponseEntity.ok(userRoles);
+  }
 
   @PostMapping("/give-role")
   @Operation(summary = "Assign a role to a user")

@@ -1,6 +1,6 @@
 package fpc.app.controller;
 
-import fpc.app.constant.OfferStatus;
+import fpc.app.constant.OfferStatusType;
 import fpc.app.dto.request.CreateTicketOfferDTO;
 import fpc.app.dto.request.StandPriceDTO;
 import fpc.app.dto.response.TicketOfferResponseDTO;
@@ -8,9 +8,8 @@ import fpc.app.dto.util.DateRange;
 import fpc.app.mapper.TicketMapper;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.TicketOffer;
-import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
-import fpc.app.service.app.ClubAdminService;
+import fpc.app.service.app.ClubService;
 import fpc.app.service.app.TicketService;
 import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +38,7 @@ public class TicketManagementController {
   private final TicketService ticketService;
   private final UserService userService;
   private final JwtUtil jwtUtil;
-  private final ClubAdminService clubAdminService;
+  private final ClubService clubService;
 
   @PostMapping(
       value = "/create",
@@ -52,8 +51,8 @@ public class TicketManagementController {
       @RequestPart("offer") @Valid CreateTicketOfferDTO dto,
       @RequestPart("file") MultipartFile file) {
 
-    User publisher = userService.getUser(jwtUtil.getUserId(token));
-    ticketService.createTicketOffer(publisher, matchId, dto, file);
+    Long userId = jwtUtil.getUserId(token);
+    ticketService.createTicketOffer(userId, matchId, dto, file);
     return ResponseEntity.ok().build();
   }
 
@@ -61,8 +60,8 @@ public class TicketManagementController {
   @Operation(summary = "Get all ticket offers for the current club")
   public ResponseEntity<List<TicketOfferResponseDTO>> getAllTicketOffers(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-    User user = userService.getUser(jwtUtil.getUserId(token));
-    Club club = clubAdminService.getClub(user);
+    Long userId = jwtUtil.getUserId(token);
+    Club club = clubService.getClubByAdminId(userId);
     List<TicketOffer> offers = ticketService.getAllClubOffers(club);
     return ResponseEntity.ok(TicketMapper.toResponseDTO(offers));
   }
@@ -77,9 +76,10 @@ public class TicketManagementController {
               examples = @ExampleObject(value = "{\"status\": \"ENABLED\"}")))
   @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
   @Operation(summary = "Toggle ticket offer status")
-  public ResponseEntity<Map<String, OfferStatus>> changeTicketOfferStatus(@PathVariable Long id) {
-    OfferStatus status = ticketService.toggleTicketOfferStatus(id);
-    Map<String, OfferStatus> res = Map.of("status", status);
+  public ResponseEntity<Map<String, OfferStatusType>> changeTicketOfferStatus(
+      @PathVariable Long id) {
+    OfferStatusType status = ticketService.toggleTicketOfferStatus(id);
+    Map<String, OfferStatusType> res = Map.of("status", status);
     return ResponseEntity.ok(res);
   }
 

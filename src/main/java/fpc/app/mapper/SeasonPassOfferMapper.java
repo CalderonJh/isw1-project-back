@@ -4,7 +4,6 @@ import fpc.app.dto.response.SeasonPassOfferDetailDTO;
 import fpc.app.dto.response.SeasonPassOfferResponseDTO;
 import fpc.app.dto.response.StandPricingDTO;
 import fpc.app.dto.util.DateRange;
-import fpc.app.dto.util.Reference;
 import fpc.app.model.app.Match;
 import fpc.app.model.app.SeasonPassOffer;
 import fpc.app.model.app.SeasonPassType;
@@ -34,13 +33,14 @@ public class SeasonPassOfferMapper {
     return SeasonPassOfferDetailDTO.builder()
         .prices(types.stream().map(SeasonPassOfferMapper::mapToStandPricingDTO).toList())
         .games(offer.getMatches().stream().map(SeasonPassOfferMapper::getAwayTeamName).toList())
+        .stadium(offer.getMatches().getFirst().getStadium().getReference())
         .build();
   }
 
   private static StandPricingDTO mapToStandPricingDTO(SeasonPassType passType) {
     return new StandPricingDTO(
         passType.getId(),
-        new Reference(passType.getStand().getId(), passType.getStand().getName()),
+        passType.getStand().getReference(),
         passType.getPrice(),
         passType.isAvailable());
   }

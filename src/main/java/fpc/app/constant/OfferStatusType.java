@@ -1,10 +1,10 @@
 package fpc.app.constant;
 
-public enum OfferStatus {
+public enum OfferStatusType {
   ENABLED,
   DISABLED;
 
-  public static OfferStatus get(boolean isPaused) {
+  public static OfferStatusType get(boolean isPaused) {
     return isPaused ? DISABLED : ENABLED;
   }
 }

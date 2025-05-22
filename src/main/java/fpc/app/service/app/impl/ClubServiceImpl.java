@@ -5,12 +5,8 @@ import static fpc.app.util.Tools.removeExtraSpaces;
 import fpc.app.dto.request.ClubCreateDTO;
 import fpc.app.exception.DataNotFoundException;
 import fpc.app.model.app.Club;
-import fpc.app.model.app.ClubAdmin;
-import fpc.app.model.auth.User;
 import fpc.app.repository.app.ClubRepository;
-import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.ClubService;
-import fpc.app.service.auth.UserService;
 import fpc.app.service.util.CloudinaryService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,26 +19,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class ClubServiceImpl implements ClubService {
   private final ClubRepository clubRepository;
   private final CloudinaryService cloudinaryService;
-  private final UserService userService;
-  private final ClubAdminService clubAdminService;
 
   @Override
-  public Club getClub(Long clubId) {
+  public Club getClubById(Long clubId) {
     return clubRepository
         .findById(clubId)
         .orElseThrow(() -> new DataNotFoundException("Club no encontrado"));
-  }
-
-  @Override
-  public Club getClubByAdmin(Long userId) {
-    User user = userService.getUser(userId);
-    return getClubByAdmin(user);
-  }
-
-  @Override
-  public Club getClubByAdmin(User user) {
-    ClubAdmin clubAdmin = clubAdminService.getClubAdmin(user);
-    return clubAdmin.getClub();
   }
 
   @Override
@@ -61,7 +43,7 @@ public class ClubServiceImpl implements ClubService {
   @Override
   @Transactional
   public void update(Long clubId, ClubCreateDTO request, MultipartFile file) {
-    Club club = this.getClub(clubId);
+    Club club = this.getClubById(clubId);
     setClubInfo(request, file, club);
     clubRepository.save(club);
   }
@@ -85,5 +67,17 @@ public class ClubServiceImpl implements ClubService {
   public List<Club> listForMatch(Club homeTeam) {
     var clubs = clubRepository.findAll();
     return clubs.stream().filter(club -> !club.getId().equals(homeTeam.getId())).toList();
+  }
+
+  @Override
+  public Club getClubByAdminId(Long userId) {
+    return clubRepository
+        .getClubByAdmin(userId)
+        .orElseThrow(() -> new DataNotFoundException("No hay club asociado a este usuario"));
+  }
+
+  @Override
+  public List<Club> getClubsForSubscription() {
+    return clubRepository.getClubsWithAdmin();
   }
 }

@@ -7,16 +7,17 @@ import java.util.List;
 public class ClubMapper {
   private ClubMapper() {}
 
-  public static ClubResponseDTO map(Club club) {
+  public static ClubResponseDTO map(Club club, boolean addAdminInfo) {
     return ClubResponseDTO.builder()
         .id(club.getId())
         .name(club.getName())
         .shortName(club.getShortName())
         .imageId(club.getImageId())
+        .admin(club.getAdmin() != null && addAdminInfo ? club.getAdmin().getReference() : null)
         .build();
   }
 
-  public static List<ClubResponseDTO> map(List<Club> clubs) {
-    return clubs.stream().map(ClubMapper::map).toList();
+  public static List<ClubResponseDTO> map(List<Club> clubs, boolean addAdminInfo) {
+    return clubs.stream().map(club -> map(club, addAdminInfo)).toList();
   }
 }

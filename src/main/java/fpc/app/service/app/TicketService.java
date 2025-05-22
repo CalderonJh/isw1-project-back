@@ -1,6 +1,6 @@
 package fpc.app.service.app;
 
-import fpc.app.constant.OfferStatus;
+import fpc.app.constant.OfferStatusType;
 import fpc.app.dto.request.CreateTicketOfferDTO;
 import fpc.app.dto.request.StandPriceDTO;
 import fpc.app.dto.util.DateRange;
@@ -16,9 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface TicketService {
 
-	void createTicketOffer(User creator, Long matchId, CreateTicketOfferDTO dto, MultipartFile file);
+	void createTicketOffer(Long publisherId, Long matchId, CreateTicketOfferDTO dto, MultipartFile file);
 
-	OfferStatus toggleTicketOfferStatus(Long ticketOfferId);
+	OfferStatusType toggleTicketOfferStatus(Long ticketOfferId);
 
 	List<TicketOffer> getActiveOffers(List<Long> clubIds, boolean getAll);
 

@@ -7,17 +7,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface TicketOfferRepository extends JpaRepository<TicketOffer, Long> {
-  @Query("select o.publisher.club.id from TicketOffer o where o.id = :offerId")
+  @Query("select o.clubId from TicketOffer o where o.id = :offerId")
   Long getClubId(Long offerId);
 
   @Query(
-      "select o from TicketOffer o where o.publisher.club.id in :clubIds and o.isPaused = false  and o.startDate <= :now and o.endDate >= :now")
+      "select o from TicketOffer o where o.clubId in :clubIds and o.isPaused = false  and o.startDate <= :now and o.endDate >= :now")
   List<TicketOffer> getOffersByClubIdIn(List<Long> clubIds, LocalDateTime now);
 
   @Query("select count(o.id) > 0 from TicketOffer o where o.match.id = :matchId")
   boolean existsMatchTicketOffer(Long matchId);
 
-  @Query("select o from TicketOffer o where o.publisher.club.id = :clubId")
+  @Query("select o from TicketOffer o where o.clubId = :clubId")
   List<TicketOffer> findByClubId(Long clubId);
 
   @Query(

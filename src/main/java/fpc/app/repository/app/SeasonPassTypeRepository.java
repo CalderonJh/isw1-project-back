@@ -2,6 +2,8 @@ package fpc.app.repository.app;
 
 import fpc.app.model.app.SeasonPassType;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -15,5 +17,5 @@ public interface SeasonPassTypeRepository extends JpaRepository<SeasonPassType, 
           "select v.available_ticket from app.season_pass_purchases v where v.season_pass_type_id = :seasonPassTypeId")
   Boolean isAvailable(Long seasonPassTypeId);
 
-  SeasonPassType findBySeasonPassOfferIdAndStandId(Long id, Long standId);
+  Optional<SeasonPassType> findBySeasonPassOfferIdAndStandId(Long id, Long standId);
 }

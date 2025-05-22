@@ -3,10 +3,7 @@ package fpc.app.component;
 import static java.lang.Long.parseLong;
 
 import fpc.app.model.app.*;
-import fpc.app.repository.app.TicketOfferRepository;
-import fpc.app.repository.app.ClubAdminRepository;
-import fpc.app.repository.app.MatchRepository;
-import fpc.app.repository.app.StadiumRepository;
+import fpc.app.repository.app.*;
 import java.io.Serializable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
@@ -15,10 +12,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ClubPermissionEvaluator implements PermissionEvaluator {
-  private ClubAdminRepository clubAdminRepository;
   private TicketOfferRepository ticketOfferRepository;
   private MatchRepository matchRepository;
   private StadiumRepository stadiumRepository;
+  private SeasonPassOfferRepository seasonPassOfferRepository;
+  private ClubRepository clubRepository;
 
   @Override
   public boolean hasPermission(
@@ -28,21 +26,18 @@ public class ClubPermissionEvaluator implements PermissionEvaluator {
     }
 
     Long userId = parseLong(authentication.getName());
-    ClubAdmin admin = clubAdminRepository.findByUser(userId).orElse(null);
-
-    if (admin == null) {
-      return false;
-    }
-
-    Long adminClubId = admin.getClub().getId();
 
     // Verificar según el tipo de objeto
     return switch (targetDomainObject) {
-      case Club club -> adminClubId.equals((club).getId());
-      case TicketOffer offer -> adminClubId.equals((offer).getPublisher().getClub().getId());
-      case Match match -> adminClubId.equals((match.getHomeClub().getId()));
+      case Club club -> hasClubPermission(userId, club.getId());
+      case TicketOffer offer -> hasClubPermission(userId, offer.getClubId());
+      case Match match -> hasClubPermission(userId, match.getHomeClub().getId());
       default -> false;
     };
+  }
+
+  private boolean hasClubPermission(Long userId, Long club) {
+    return clubRepository.existsPermission(userId, club);
   }
 
   @Override
@@ -54,33 +49,41 @@ public class ClubPermissionEvaluator implements PermissionEvaluator {
     }
 
     Long userId = parseLong(authentication.getName());
-    ClubAdmin admin = clubAdminRepository.findByUser(userId).orElse(null);
-
-    if (admin == null) {
-      return false;
-    }
-
-    Long clubId = admin.getClub().getId();
 
     Long recordId = Long.valueOf(targetId.toString());
     return switch (targetType) {
-      case "Club" -> clubId.equals(recordId);
-      case "Match" -> clubId.equals(matchRepository.getHomeClubId(recordId));
-      case "Stadium" -> clubId.equals(stadiumRepository.getClubId(recordId));
-      case "TicketOffer" -> clubId.equals(ticketOfferRepository.getClubId(recordId));
-      case "SeasonPassOffer" -> clubId.equals(ticketOfferRepository.getClubId(recordId));
+      case "Club" -> hasClubPermission(userId, recordId);
+      case "Match" -> hasMatchPermission(userId, recordId);
+      case "Stadium" -> hasStadiumPermission(userId, recordId);
+      case "TicketOffer" -> hasTicketOfferPermission(userId, recordId);
+      case "SeasonPassOffer" -> hasSeasonPassOfferPermission(userId, recordId);
       default -> false;
     };
+  }
+
+  private boolean hasSeasonPassOfferPermission(Long userId, Long recordId) {
+    Long clubId = seasonPassOfferRepository.getClubId(recordId);
+    return hasClubPermission(userId, clubId);
+  }
+
+  private boolean hasTicketOfferPermission(Long userId, Long offerId) {
+    Long clubId = ticketOfferRepository.getClubId(offerId);
+    return hasClubPermission(userId, clubId);
+  }
+
+  private boolean hasStadiumPermission(Long userId, Long stadiumId) {
+    Long clubId = stadiumRepository.getClubId(stadiumId);
+    return hasClubPermission(userId, clubId);
+  }
+
+  private boolean hasMatchPermission(Long userId, Long matchId) {
+    Long clubId = matchRepository.getHomeClubId(matchId);
+    return hasClubPermission(userId, clubId);
   }
 
   @Autowired
   public void setMatchRepository(MatchRepository matchRepository) {
     this.matchRepository = matchRepository;
-  }
-
-  @Autowired
-  public void setClubAdminRepository(ClubAdminRepository clubAdminRepository) {
-    this.clubAdminRepository = clubAdminRepository;
   }
 
   @Autowired
@@ -91,5 +94,15 @@ public class ClubPermissionEvaluator implements PermissionEvaluator {
   @Autowired
   public void setStadiumRepository(StadiumRepository stadiumRepository) {
     this.stadiumRepository = stadiumRepository;
+  }
+
+  @Autowired
+  public void setSeasonPassOfferRepository(SeasonPassOfferRepository seasonPassOfferRepository) {
+    this.seasonPassOfferRepository = seasonPassOfferRepository;
+  }
+
+  @Autowired
+  public void setClubRepository(ClubRepository clubRepository) {
+    this.clubRepository = clubRepository;
   }
 }

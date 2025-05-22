@@ -2,6 +2,7 @@ package fpc.app.model.app;
 
 import static fpc.app.util.Tools.equalsText;
 
+import fpc.app.dto.util.Reference;
 import fpc.app.exception.ValidationException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -46,5 +47,14 @@ public class Stadium {
 
   public void clearStands() {
     this.stands.clear();
+  }
+
+  public Stand getStand(String standName) {
+    for (Stand stand : stands) if (equalsText(stand.getName(), standName)) return stand;
+    return null;
+  }
+
+  public Reference getReference() {
+    return new Reference(this.id, this.name);
   }
 }

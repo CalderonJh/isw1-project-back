@@ -15,7 +15,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 
 @Slf4j
 @ControllerAdvice
@@ -60,11 +59,10 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler({NullPointerException.class})
-  public ResponseEntity<ErrorDetails> handleNullPointerException(
-      NullPointerException ex, WebRequest request) {
+  public ResponseEntity<ErrorDetails> handleNullPointerException(NullPointerException ex) {
     log.error("Null pointer: {}", ex.getMessage());
     ErrorDetails errorDetails =
-        new ErrorDetails(LocalDateTime.now(), DEFAULT_ERROR_MESSAGE, request.getDescription(false));
+        new ErrorDetails(LocalDateTime.now(), DEFAULT_ERROR_MESSAGE, ex.getMessage());
     return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 

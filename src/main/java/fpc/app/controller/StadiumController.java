@@ -4,11 +4,9 @@ import fpc.app.dto.StadiumDTO;
 import fpc.app.mapper.StadiumMapper;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.Stadium;
-import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
-import fpc.app.service.app.ClubAdminService;
+import fpc.app.service.app.ClubService;
 import fpc.app.service.app.StadiumService;
-import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,8 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class StadiumController {
   private final StadiumService stadiumService;
   private final JwtUtil jwtUtil;
-  private final UserService userService;
-  private final ClubAdminService clubAdminService;
+  private final ClubService clubService;
 
   @PostMapping(
       value = "/create",
@@ -41,8 +38,7 @@ public class StadiumController {
       @RequestPart("image") MultipartFile image,
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
     Long userId = jwtUtil.getUserId(token);
-    User creator = userService.getUser(userId);
-    Club club = clubAdminService.getClub(creator);
+    Club club = clubService.getClubByAdminId(userId);
     stadiumService.createStadium(club, request, image);
     return ResponseEntity.ok().build();
   }
@@ -70,7 +66,7 @@ public class StadiumController {
   public ResponseEntity<List<StadiumDTO>> getAllStadiums(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
     Long userId = jwtUtil.getUserId(token);
-    Club club = clubAdminService.getClub(new User(userId));
+    Club club = clubService.getClubByAdminId(userId);
     List<Stadium> stadiums = stadiumService.getStadiums(club);
     return ResponseEntity.ok(StadiumMapper.map(stadiums));
   }

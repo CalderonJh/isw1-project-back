@@ -18,9 +18,12 @@ public class TicketOffer extends Offer {
 	private Long id;
 
   @NotNull
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "posted_by", nullable = false)
-  private ClubAdmin publisher;
+  @Column(name = "posted_by", nullable = false)
+  private Long publisherId;
+
+	@NotNull
+	@Column(name = "club_id", nullable = false)
+	private Long clubId;
 
 	@NotNull
 	@ManyToOne

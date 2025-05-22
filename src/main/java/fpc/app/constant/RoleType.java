@@ -2,7 +2,7 @@ package fpc.app.constant;
 
 import fpc.app.model.auth.Role;
 
-public enum UserRole {
+public enum RoleType {
   USER,
   CLUB_ADMIN,
   SUPERUSER;

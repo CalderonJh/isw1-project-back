@@ -4,7 +4,7 @@ import static fpc.app.util.Tools.getColTime;
 import static fpc.app.util.Tools.isFutureDate;
 import static java.util.Objects.isNull;
 
-import fpc.app.constant.OfferStatus;
+import fpc.app.constant.OfferStatusType;
 import fpc.app.dto.request.CreateSeasonPassOfferDTO;
 import fpc.app.dto.request.StandPriceDTO;
 import fpc.app.dto.response.SeasonPassOfferDetailDTO;
@@ -14,12 +14,12 @@ import fpc.app.exception.ValidationException;
 import fpc.app.mapper.SeasonPassOfferMapper;
 import fpc.app.model.app.*;
 import fpc.app.model.auth.User;
-import fpc.app.repository.app.MatchRepository;
-import fpc.app.repository.app.SeasonPassHolderRepository;
-import fpc.app.repository.app.SeasonPassOfferRepository;
-import fpc.app.repository.app.SeasonPassTypeRepository;
+import fpc.app.repository.app.*;
+import fpc.app.service.app.ClubService;
 import fpc.app.service.app.SeasonPassOfferService;
+import fpc.app.service.app.StadiumService;
 import fpc.app.service.util.CloudinaryService;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,18 +36,23 @@ public class SeasonPassOfferServiceImpl implements SeasonPassOfferService {
   private final CloudinaryService cloudinaryService;
   private final SeasonPassTypeRepository seasonPassTypeRepository;
   private final SeasonPassHolderRepository seasonPassHolderRepository;
+  private final ClubService clubService;
+  private final StadiumService stadiumService;
 
   @Override
   @Transactional
   public void createSeasonPassOffer(
-      ClubAdmin clubAdmin, CreateSeasonPassOfferDTO dto, MultipartFile image) {
+      Long clubAdminId, CreateSeasonPassOfferDTO dto, MultipartFile image) {
+    Club club = clubService.getClubByAdminId(clubAdminId);
     List<Match> matches = matchRepository.findAllById(dto.matchIds());
-    validateGames(clubAdmin.getClub().getId(), matches);
+    validateGames(club.getId(), matches);
     validateStands(dto.standPrices(), matches.getFirst().getStadium());
     String imageId = image == null ? null : cloudinaryService.uploadImage(image);
     SeasonPassOffer toSave =
         SeasonPassOffer.builder()
-            .publisher(clubAdmin)
+            .publisherId(clubAdminId)
+            .club(club)
+            .stadiumId(matches.getFirst().getStadium().getId())
             .description(dto.description())
             .season(dto.season())
             .year(dto.year())
@@ -134,15 +139,15 @@ public class SeasonPassOfferServiceImpl implements SeasonPassOfferService {
 
   @Override
   public List<SeasonPassOffer> getAllSeasonPassOffers(Club club) {
-    return seasonPassOfferRepository.findAllByPublisherClubId(club.getId());
+    return seasonPassOfferRepository.findAllByClubId(club.getId());
   }
 
   @Override
-  public OfferStatus toggleSeasonPassOfferStatus(Long offerId) {
+  public OfferStatusType toggleSeasonPassOfferStatus(Long offerId) {
     SeasonPassOffer offer = getSeasonPassOffer(offerId);
     offer.setPaused(!offer.isPaused());
     seasonPassOfferRepository.save(offer);
-    return OfferStatus.get(offer.isPaused());
+    return OfferStatusType.get(offer.isPaused());
   }
 
   @Override
@@ -172,12 +177,30 @@ public class SeasonPassOfferServiceImpl implements SeasonPassOfferService {
 
   @Override
   @Transactional
-  public void updateSeasonPassOfferPrice(Long id, Set<StandPriceDTO> prices) {
+  public void updateSeasonPassOfferPrice(Long offerId, Set<StandPriceDTO> prices) {
+    SeasonPassOffer offer = getSeasonPassOffer(offerId);
     for (StandPriceDTO price : prices) {
       SeasonPassType seasonPassType =
-          seasonPassTypeRepository.findBySeasonPassOfferIdAndStandId(id, price.standId());
+          seasonPassTypeRepository
+              .findBySeasonPassOfferIdAndStandId(offerId, price.standId())
+              .orElse(null);
+      if (seasonPassType != null) {
       seasonPassType.setPrice(price.price());
-      seasonPassTypeRepository.save(seasonPassType);
+        seasonPassTypeRepository.save(seasonPassType);
+      } else createNewSeasonPassType(offer, price.standId(), price.price());
     }
+  }
+
+  public void createNewSeasonPassType(SeasonPassOffer offer, Long standId, BigDecimal price) {
+    List<Stand> stands = stadiumService.getStadium(offer.getStadiumId()).getStands();
+    if (stands.stream().noneMatch(s -> s.getId().equals(standId)))
+      throw new ValidationException("La tribuna no pertenece al estadio");
+
+    seasonPassTypeRepository.save(
+        SeasonPassType.builder()
+            .seasonPassOfferId(offer.getId())
+            .stand(new Stand(standId))
+            .price(price)
+            .build());
   }
 }

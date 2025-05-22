@@ -3,8 +3,6 @@ package fpc.app.mapper;
 import fpc.app.dto.response.StandPricingDTO;
 import fpc.app.dto.response.TicketOfferResponseDTO;
 import fpc.app.dto.util.DateRange;
-import fpc.app.dto.util.Reference;
-import fpc.app.dto.util.Suggestion;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.TicketOffer;
 import fpc.app.model.app.TicketType;
@@ -16,8 +14,9 @@ public class TicketMapper {
     Club awayClub = ticketOffer.getMatch().getAwayClub();
     return TicketOfferResponseDTO.builder()
         .id(ticketOffer.getId())
-        .homeClub(new Suggestion(homeClub.getId(), homeClub.getShortName()))
-        .awayClub(new Suggestion(awayClub.getId(), awayClub.getShortName()))
+        .homeClub(homeClub.getReference())
+        .awayClub(awayClub.getReference())
+        .stadium(ticketOffer.getMatch().getStadium().getReference())
         .matchDay(ticketOffer.getMatch().getStartDate())
         .offerPeriod(new DateRange(ticketOffer.getStartDate(), ticketOffer.getEndDate()))
         .imageId(ticketOffer.getImageId())
@@ -32,7 +31,7 @@ public class TicketMapper {
   public static StandPricingDTO toTicketTypeDTO(TicketType ticketType) {
     return new StandPricingDTO(
         ticketType.getId(),
-        new Reference(ticketType.getStand().getId(), ticketType.getStand().getName()),
+        ticketType.getStand().getReference(),
         ticketType.getPrice(),
         ticketType.isAvailable());
   }

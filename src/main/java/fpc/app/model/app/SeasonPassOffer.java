@@ -22,9 +22,17 @@ public class SeasonPassOffer extends Offer {
 	private Long id;
 
   @NotNull
+  @Column(name = "posted_by", nullable = false)
+  private Long publisherId;
+
+  @NotNull
+  @Column(name = "stadium_id", nullable = false)
+  private Long stadiumId;
+
+  @NotNull
   @ManyToOne
-  @JoinColumn(name = "posted_by", nullable = false)
-  private ClubAdmin publisher;
+  @JoinColumn(name = "club_id", nullable = false)
+  private Club club;
 
   @NotNull
   @Column(name = "description", nullable = false)
@@ -48,8 +56,6 @@ public class SeasonPassOffer extends Offer {
       inverseJoinColumns = @JoinColumn(name = "match_id"))
 	@Builder.Default
   private List<Match> matches = new ArrayList<>();
-
-
 
   public void addMatch(Match match) {
     if (matches == null) {

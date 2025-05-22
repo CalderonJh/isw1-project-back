@@ -5,7 +5,7 @@ import fpc.app.dto.util.Suggestion;
 import fpc.app.mapper.ClubMapper;
 import fpc.app.model.app.Club;
 import fpc.app.model.app.IdentityDocument;
-import fpc.app.service.app.ClubAdminService;
+import fpc.app.service.app.ClubService;
 import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Public endpoints")
 public class PublicController {
 	private final UserService userService;
-  private final ClubAdminService clubAdminService;
+  private final ClubService clubService;
 
   @GetMapping("/idoc-types")
   @Operation(summary = "Get all identity document types")
@@ -37,7 +37,7 @@ public class PublicController {
   @GetMapping("/club/list")
   @Operation(summary = "List all clubs available for user subscription")
   public ResponseEntity<List<ClubResponseDTO>> list() {
-    List<Club> clubs = clubAdminService.getAllClubs();
-    return ResponseEntity.ok(ClubMapper.map(clubs));
+    List<Club> clubs = clubService.getClubsForSubscription();
+    return ResponseEntity.ok(ClubMapper.map(clubs, false));
   }
 }

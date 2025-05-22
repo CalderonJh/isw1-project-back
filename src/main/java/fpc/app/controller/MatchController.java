@@ -9,12 +9,9 @@ import fpc.app.dto.response.MatchResponseDTO;
 import fpc.app.mapper.ClubMapper;
 import fpc.app.mapper.MatchMapper;
 import fpc.app.model.app.Club;
-import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
-import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.ClubService;
 import fpc.app.service.app.MatchService;
-import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,8 +32,6 @@ public class MatchController {
   private final JwtUtil jwtUtil;
   private final MatchService matchService;
   private final ClubService clubService;
-  private final UserService userService;
-  private final ClubAdminService clubAdminService;
 
   @GetMapping("/all")
   @Parameter(
@@ -52,7 +47,7 @@ public class MatchController {
     MatchSearchType matchSearchType =
         hasText(toOffer) ? MatchSearchType.fromString(toOffer) : MatchSearchType.ALL;
     Long userId = jwtUtil.getUserId(token);
-    Club club = clubService.getClubByAdmin(userId);
+    Club club = clubService.getClubByAdminId(userId);
     var matches = matchService.getMatches(club, matchSearchType, stadiumId);
     return ResponseEntity.ok(MatchMapper.toResponseDTO(matches));
   }
@@ -61,10 +56,10 @@ public class MatchController {
   @Operation(summary = "List available clubs for match creation, that is all except the current club")
   public ResponseEntity<List<ClubResponseDTO>> list(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-    User user = userService.getUser(jwtUtil.getUserId(token));
-    Club club = clubService.getClubByAdmin(user);
+    Long userId = jwtUtil.getUserId(token);
+    Club club = clubService.getClubByAdminId(userId);
     List<Club> clubs = clubService.listForMatch(club);
-    return ResponseEntity.ok(ClubMapper.map(clubs));
+    return ResponseEntity.ok(ClubMapper.map(clubs, false));
   }
 
   @PostMapping("/save")
@@ -73,8 +68,7 @@ public class MatchController {
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestBody @Valid MatchCreationDTO matchCreationDTO) {
     Long userId = jwtUtil.getUserId(token);
-    User user = userService.getUser(userId);
-    Club homeClub = clubAdminService.getClub(user);
+    Club homeClub = clubService.getClubByAdminId(userId);
 
     matchService.create(homeClub, matchCreationDTO);
     return new ResponseEntity<>(HttpStatus.CREATED);
@@ -92,7 +86,7 @@ public class MatchController {
   @DeleteMapping("/delete/{id}")
   @PreAuthorize("hasPermission(#id, 'Match', 'ANY')")
   @Operation(summary = "Delete a match")
-  public ResponseEntity<MatchCreationDTO> removeMatch(@PathVariable Long id) {
+  public ResponseEntity<Void> removeMatch(@PathVariable Long id) {
     matchService.deleteMatch(id);
     return ResponseEntity.status(HttpStatus.OK).build();
   }

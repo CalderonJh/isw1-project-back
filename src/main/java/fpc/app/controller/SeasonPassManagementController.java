@@ -1,19 +1,16 @@
 package fpc.app.controller;
 
-import fpc.app.constant.OfferStatus;
+import fpc.app.constant.OfferStatusType;
 import fpc.app.dto.request.CreateSeasonPassOfferDTO;
 import fpc.app.dto.request.StandPriceDTO;
 import fpc.app.dto.response.SeasonPassOfferResponseDTO;
 import fpc.app.dto.util.DateRange;
 import fpc.app.mapper.SeasonPassOfferMapper;
 import fpc.app.model.app.Club;
-import fpc.app.model.app.ClubAdmin;
 import fpc.app.model.app.SeasonPassOffer;
-import fpc.app.model.auth.User;
 import fpc.app.security.JwtUtil;
-import fpc.app.service.app.ClubAdminService;
+import fpc.app.service.app.ClubService;
 import fpc.app.service.app.SeasonPassOfferService;
-import fpc.app.service.auth.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,6 +21,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,23 +32,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/club-admin/season-pass")
 @Tag(name = "Season Pass Management")
+@RequiredArgsConstructor
 public class SeasonPassManagementController {
 
-  private final UserService userService;
   private final JwtUtil jwtUtil;
-  private final ClubAdminService clubAdminService;
   private final SeasonPassOfferService seasonPassOfferService;
-
-  public SeasonPassManagementController(
-      UserService userService,
-      JwtUtil jwtUtil,
-      ClubAdminService clubAdminService,
-      SeasonPassOfferService seasonPassOfferService) {
-    this.userService = userService;
-    this.jwtUtil = jwtUtil;
-    this.clubAdminService = clubAdminService;
-    this.seasonPassOfferService = seasonPassOfferService;
-  }
+  private final ClubService clubService;
 
   @PostMapping(
       value = "/create",
@@ -60,9 +47,8 @@ public class SeasonPassManagementController {
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token,
       @RequestPart("offer") CreateSeasonPassOfferDTO dto,
       @RequestPart("file") MultipartFile image) {
-    User user = userService.getUser(jwtUtil.getUserId(token));
-    ClubAdmin clubAdmin = clubAdminService.getClubAdmin(user);
-    seasonPassOfferService.createSeasonPassOffer(clubAdmin, dto, image);
+    Long userId = jwtUtil.getUserId(token);
+    seasonPassOfferService.createSeasonPassOffer(userId, dto, image);
     return ResponseEntity.ok().build();
   }
 
@@ -70,8 +56,8 @@ public class SeasonPassManagementController {
   @Operation(summary = "Get all season pass offers of the current club")
   public ResponseEntity<List<SeasonPassOfferResponseDTO>> getAll(
       @Parameter(hidden = true) @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
-    User user = userService.getUser(jwtUtil.getUserId(token));
-    Club club = clubAdminService.getClub(user);
+    Long userId = jwtUtil.getUserId(token);
+    Club club = clubService.getClubByAdminId(userId);
     List<SeasonPassOffer> offers = seasonPassOfferService.getAllSeasonPassOffers(club);
     return ResponseEntity.ok(SeasonPassOfferMapper.toResponseDTO(offers));
   }
@@ -86,9 +72,9 @@ public class SeasonPassManagementController {
   @PutMapping("/{offerId}/toggle-status")
   @Operation(summary = "Toggle season pass offer status")
   @PreAuthorize("hasPermission(#offerId, 'SeasonPassOffer', 'ANY')")
-  public ResponseEntity<Map<String, OfferStatus>> toggleStatus(@PathVariable Long offerId) {
-    OfferStatus status = seasonPassOfferService.toggleSeasonPassOfferStatus(offerId);
-    Map<String, OfferStatus> map = Map.of("status", status);
+  public ResponseEntity<Map<String, OfferStatusType>> toggleStatus(@PathVariable Long offerId) {
+    OfferStatusType status = seasonPassOfferService.toggleSeasonPassOfferStatus(offerId);
+    Map<String, OfferStatusType> map = Map.of("status", status);
     return ResponseEntity.ok(map);
   }
 
@@ -112,7 +98,7 @@ public class SeasonPassManagementController {
   }
 
   @PutMapping("/{id}/update/price")
-  @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
+  @PreAuthorize("hasPermission(#id, 'SeasonPassOffer', 'ANY')")
   @Operation(summary = "Update ticket offer price")
   public ResponseEntity<Void> updateTicketOfferPrice(
       @PathVariable Long id, @RequestBody @Valid Set<StandPriceDTO> prices) {

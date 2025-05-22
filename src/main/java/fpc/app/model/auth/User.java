@@ -1,5 +1,6 @@
 package fpc.app.model.auth;
 
+import fpc.app.dto.util.Reference;
 import fpc.app.model.app.Person;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -42,5 +43,9 @@ public class User {
 
   public User(Long id) {
     this.id = id;
+  }
+
+  public Reference getReference() {
+    return new Reference(id, username);
   }
 }

@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
             .person(person)
             .username(request.email())
             .password(encoder.encode(request.password()))
-            .roles(Set.of(roleRepository.findByName("USER").orElseThrow()))
+            .roles(Set.of())
             .build());
   }
 

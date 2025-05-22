@@ -2,7 +2,7 @@ package fpc.app.service.app.impl;
 
 import static fpc.app.util.Tools.*;
 
-import fpc.app.constant.OfferStatus;
+import fpc.app.constant.OfferStatusType;
 import fpc.app.dto.request.CreateTicketOfferDTO;
 import fpc.app.dto.request.StandPriceDTO;
 import fpc.app.dto.util.DateRange;
@@ -13,7 +13,6 @@ import fpc.app.model.auth.User;
 import fpc.app.repository.app.TicketOfferRepository;
 import fpc.app.repository.app.TicketPurchaseRepository;
 import fpc.app.repository.app.TicketTypeRepository;
-import fpc.app.service.app.ClubAdminService;
 import fpc.app.service.app.MatchService;
 import fpc.app.service.app.TicketService;
 import fpc.app.service.util.CloudinaryService;
@@ -32,15 +31,13 @@ public class TicketServiceImpl implements TicketService {
   private final TicketOfferRepository ticketOfferRepository;
   private final MatchService matchService;
   private final CloudinaryService cloudinaryService;
-  private final ClubAdminService clubAdminService;
   private final TicketTypeRepository ticketTypeRepository;
   private final TicketPurchaseRepository ticketPurchaseRepository;
 
   @Override
   @Transactional
   public void createTicketOffer(
-      User creator, Long matchId, CreateTicketOfferDTO dto, MultipartFile file) {
-    ClubAdmin clubAdmin = clubAdminService.getClubAdmin(creator);
+      Long publisherId, Long matchId, CreateTicketOfferDTO dto, MultipartFile file) {
     String imageId = cloudinaryService.uploadImage(file);
     Match match = matchService.getMatch(matchId);
     validateMatch(match);
@@ -50,7 +47,7 @@ public class TicketServiceImpl implements TicketService {
         save(
             TicketOffer.builder()
                 .match(match)
-                .publisher(clubAdmin)
+                .publisherId(publisherId)
                 .startDate(saleStartDate)
                 .endDate(saleEndDate)
                 .imageId(imageId)
@@ -105,11 +102,11 @@ public class TicketServiceImpl implements TicketService {
   }
 
   @Override
-  public OfferStatus toggleTicketOfferStatus(Long ticketOfferId) {
+  public OfferStatusType toggleTicketOfferStatus(Long ticketOfferId) {
     TicketOffer offer = this.getTicketOffer(ticketOfferId);
     offer.setPaused(!offer.isPaused());
     ticketOfferRepository.save(offer);
-    return OfferStatus.get(offer.isPaused());
+    return OfferStatusType.get(offer.isPaused());
   }
 
   public TicketOffer getTicketOffer(Long ticketOfferId) {
