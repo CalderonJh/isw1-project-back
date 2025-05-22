@@ -23,6 +23,6 @@ public class StadiumMapper {
   }
 
   public static StandDTO mapStand(Stand stand) {
-    return new StandDTO(stand.getName(), stand.getCapacity());
+    return new StandDTO(stand.getId(), stand.getName(), stand.getCapacity());
   }
 }
