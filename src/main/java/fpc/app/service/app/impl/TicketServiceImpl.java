@@ -174,7 +174,13 @@ public class TicketServiceImpl implements TicketService {
   public void updateTicketOfferPrice(Long offerId, Set<StandPriceDTO> prices) {
     for (StandPriceDTO standPrice : prices) {
       TicketType ticketType =
-          ticketTypeRepository.findByTicketOfferIdAndStandId(offerId, standPrice.standId());
+          ticketTypeRepository
+              .findByTicketOfferIdAndStandId(offerId, standPrice.standId())
+              .orElse(
+                  TicketType.builder()
+                      .ticketOfferId(offerId)
+                      .stand(new Stand(standPrice.standId()))
+                      .build());
       ticketType.setPrice(standPrice.price());
       ticketTypeRepository.save(ticketType);
     }

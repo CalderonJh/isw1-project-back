@@ -4,13 +4,15 @@ import fpc.app.model.app.TicketType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface TicketTypeRepository extends JpaRepository<TicketType, Long> {
 	List<TicketType> findByTicketOfferId(Long ticketOfferId);
 
-	TicketType findByTicketOfferIdAndStandId(Long offerId, @NotNull @Positive Long aLong);
+	Optional<TicketType> findByTicketOfferIdAndStandId(Long offerId, @NotNull @Positive Long aLong);
 
   @Query(
       nativeQuery = true,
