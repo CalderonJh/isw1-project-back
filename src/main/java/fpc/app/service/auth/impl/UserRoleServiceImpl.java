@@ -1,6 +1,5 @@
 package fpc.app.service.auth.impl;
 
-import static java.util.Objects.isNull;
 
 import fpc.app.constant.UserRole;
 import fpc.app.exception.DataNotFoundException;
@@ -41,8 +40,10 @@ public class UserRoleServiceImpl implements UserRoleService {
   }
 
   private void giveClubAdminRole(User user, Club club) {
-    ClubAdmin admin = clubAdminService.getClubAdmin(user);
-    if (isNull(admin)) {
+    ClubAdmin admin;
+    try {
+      admin = clubAdminService.getClubAdmin(user);
+    } catch (DataNotFoundException e) {
       clubAdminService.save(
           ClubAdmin.builder().user(user).club(club).startDate(new Date()).endDate(null).build());
       user.getRoles().add(getRole(UserRole.CLUB_ADMIN));
