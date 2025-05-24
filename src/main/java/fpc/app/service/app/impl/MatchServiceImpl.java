@@ -16,6 +16,7 @@ import fpc.app.service.app.MatchService;
 import fpc.app.service.app.StadiumService;
 import jakarta.validation.constraints.Future;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import lombok.NonNull;
@@ -91,7 +92,9 @@ public class MatchServiceImpl implements MatchService {
     
     match.setSeason(dto.season());
     match.setYear(dto.year());
-    if (!Objects.equals(match.getStartDate(), dto.matchDate())) {
+    if (!Objects.equals(
+        match.getStartDate().truncatedTo(ChronoUnit.DAYS),
+        dto.matchDate().truncatedTo(ChronoUnit.DAYS))) {
       validateMatchDay(club.getId(), dto.matchDate());
       match.setStartDate(dto.matchDate());
     }
