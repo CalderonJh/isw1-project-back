@@ -69,7 +69,7 @@ public class SeasonPassManagementController {
           @Content(
               mediaType = "application/json",
               examples = @ExampleObject(value = "{\"status\": \"ENABLED\"}")))
-  @PutMapping("/{offerId}/toggle-status")
+  @PatchMapping("/{offerId}/toggle-status")
   @Operation(summary = "Toggle season pass offer status")
   @PreAuthorize("hasPermission(#offerId, 'SeasonPassOffer', 'ANY')")
   public ResponseEntity<Map<String, OfferStatusType>> toggleStatus(@PathVariable Long offerId) {
@@ -78,7 +78,7 @@ public class SeasonPassManagementController {
     return ResponseEntity.ok(map);
   }
 
-  @PutMapping(
+  @PatchMapping(
       value = "/{id}/update/image",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Operation(summary = "Update season pass offer image")
@@ -89,7 +89,7 @@ public class SeasonPassManagementController {
     return ResponseEntity.ok().build();
   }
 
-  @PutMapping("/{id}/update/dates")
+  @PatchMapping("/{id}/update/dates")
   @Operation(summary = "Update season pass offer dates")
   @PreAuthorize("hasPermission(#id, 'SeasonPassOffer', 'ANY')")
   public ResponseEntity<Void> updateDate(@PathVariable Long id, @RequestBody DateRange dates) {
@@ -97,7 +97,7 @@ public class SeasonPassManagementController {
     return ResponseEntity.ok().build();
   }
 
-  @PutMapping("/{id}/update/price")
+  @PatchMapping("/{id}/update/price")
   @PreAuthorize("hasPermission(#id, 'SeasonPassOffer', 'ANY')")
   @Operation(summary = "Update ticket offer price")
   public ResponseEntity<Void> updateTicketOfferPrice(

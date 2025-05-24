@@ -36,7 +36,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "Tickets offer management")
 public class TicketManagementController {
   private final TicketService ticketService;
-  private final UserService userService;
   private final JwtUtil jwtUtil;
   private final ClubService clubService;
 
@@ -66,7 +65,7 @@ public class TicketManagementController {
     return ResponseEntity.ok(TicketMapper.toResponseDTO(offers));
   }
 
-  @PutMapping("/{id}/toggle-status")
+  @PatchMapping("/{id}/toggle-status")
   @ApiResponse(
       responseCode = "200",
       description = "Nuevo estado de la oferta",
@@ -83,7 +82,7 @@ public class TicketManagementController {
     return ResponseEntity.ok(res);
   }
 
-  @PutMapping(
+  @PatchMapping(
       value = "/{id}/update/image",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
@@ -94,7 +93,7 @@ public class TicketManagementController {
     return ResponseEntity.ok().build();
   }
 
-  @PutMapping("/{id}/update/dates")
+  @PatchMapping("/{id}/update/dates")
   @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
   @Operation(summary = "Update ticket offer dates")
   public ResponseEntity<Void> updateTicketOfferDates(
@@ -103,7 +102,7 @@ public class TicketManagementController {
     return ResponseEntity.ok().build();
   }
 
-  @PutMapping("/{id}/update/price")
+  @PatchMapping("/{id}/update/price")
   @PreAuthorize("hasPermission(#id, 'TicketOffer', 'ANY')")
   @Operation(summary = "Update ticket offer price")
   public ResponseEntity<Void> updateTicketOfferPrice(
