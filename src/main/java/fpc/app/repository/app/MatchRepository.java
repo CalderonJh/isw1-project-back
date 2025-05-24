@@ -35,7 +35,7 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
 				""")
   List<Match> findValidMatchesForTicketsOffer(Long id, LocalDateTime colTime, Long stadiumId);
 
-  @Query("select m from Match m where m.homeClub.id = :id and m.startDate > :colTime and :stadiumId is null or m.stadium.id = :stadiumId")
+  @Query("select m from Match m where m.homeClub.id = :id and (m.startDate is not null and m.startDate > :colTime ) and (:stadiumId is null or m.stadium.id = :stadiumId)")
   List<Match> findByHomeClubIdAndFuture(Long id, LocalDateTime colTime, Long stadiumId);
 
   @Query(
