@@ -36,8 +36,8 @@ public class ClubPermissionEvaluator implements PermissionEvaluator {
     };
   }
 
-  private boolean hasClubPermission(Long userId, Long club) {
-    return clubRepository.existsPermission(userId, club);
+  private boolean hasClubPermission(Long userId, Long clubId) {
+    return clubRepository.existsPermission(userId, clubId);
   }
 
   @Override

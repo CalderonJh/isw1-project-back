@@ -48,6 +48,7 @@ public class TicketServiceImpl implements TicketService {
             TicketOffer.builder()
                 .match(match)
                 .publisherId(publisherId)
+                .clubId(match.getHomeClub().getId())
                 .startDate(saleStartDate)
                 .endDate(saleEndDate)
                 .imageId(imageId)
