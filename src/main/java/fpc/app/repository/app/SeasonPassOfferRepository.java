@@ -11,7 +11,7 @@ public interface SeasonPassOfferRepository extends JpaRepository<SeasonPassOffer
   Long getClubId(Long offerId);
 
   @Query(
-      "select o from SeasonPassOffer o where o.isPaused = false and o.startDate <= :colTime and o.endDate >= :colTime")
+      "select o from SeasonPassOffer o where o.isPaused = false and o.startDate <= :colTime and o.endDate >= :colTime and o.club.id in :clubIds")
   List<SeasonPassOffer> findAllActiveByClubIdIn(List<Long> clubIds, LocalDateTime colTime);
 
   @Query("select o from SeasonPassOffer o where o.isPaused = false and o.startDate <= :colTime and o.endDate >= :colTime")
