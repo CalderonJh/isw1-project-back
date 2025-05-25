@@ -7,6 +7,7 @@ import fpc.app.dto.util.DateRange;
 import fpc.app.model.app.Match;
 import fpc.app.model.app.SeasonPassOffer;
 import fpc.app.model.app.SeasonPassType;
+import fpc.app.model.app.Stadium;
 import java.util.List;
 
 public class SeasonPassOfferMapper {
@@ -30,10 +31,12 @@ public class SeasonPassOfferMapper {
 
   public static SeasonPassOfferDetailDTO toDetailDTO(
       List<SeasonPassType> types, SeasonPassOffer offer) {
+    Stadium stadium = offer.getMatches().getFirst().getStadium();
     return SeasonPassOfferDetailDTO.builder()
         .prices(types.stream().map(SeasonPassOfferMapper::mapToStandPricingDTO).toList())
         .games(offer.getMatches().stream().map(SeasonPassOfferMapper::getAwayTeamName).toList())
-        .stadium(offer.getMatches().getFirst().getStadium().getReference())
+        .stadium(stadium.getReference())
+        .stadiumImageId(stadium.getImageId())
         .build();
   }
 

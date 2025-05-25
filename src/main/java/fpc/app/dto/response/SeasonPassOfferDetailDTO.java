@@ -6,4 +6,4 @@ import lombok.Builder;
 
 @Builder
 public record SeasonPassOfferDetailDTO(
-    List<StandPricingDTO> prices, List<String> games, Reference stadium) {}
+    List<StandPricingDTO> prices, List<String> games, Reference stadium, String stadiumImageId) {}
