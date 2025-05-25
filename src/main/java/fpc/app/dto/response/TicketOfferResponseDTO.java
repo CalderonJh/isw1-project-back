@@ -11,6 +11,7 @@ public record TicketOfferResponseDTO(
     Reference homeClub,
     Reference awayClub,
     Reference stadium,
+		String stadiumImageId,
     LocalDateTime matchDay,
     DateRange offerPeriod,
     String imageId,
