@@ -26,8 +26,9 @@ public class SeasonPassOffer extends Offer {
   private Long publisherId;
 
   @NotNull
-  @Column(name = "stadium_id", nullable = false)
-  private Long stadiumId;
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "stadium_id", nullable = false)
+  private Stadium stadium;
 
   @NotNull
   @ManyToOne

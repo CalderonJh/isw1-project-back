@@ -17,7 +17,6 @@ import fpc.app.model.auth.User;
 import fpc.app.repository.app.*;
 import fpc.app.service.app.ClubService;
 import fpc.app.service.app.SeasonPassOfferService;
-import fpc.app.service.app.StadiumService;
 import fpc.app.service.util.CloudinaryService;
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,7 +36,6 @@ public class SeasonPassOfferServiceImpl implements SeasonPassOfferService {
   private final SeasonPassTypeRepository seasonPassTypeRepository;
   private final SeasonPassHolderRepository seasonPassHolderRepository;
   private final ClubService clubService;
-  private final StadiumService stadiumService;
 
   @Override
   @Transactional
@@ -52,7 +50,7 @@ public class SeasonPassOfferServiceImpl implements SeasonPassOfferService {
         SeasonPassOffer.builder()
             .publisherId(clubAdminId)
             .club(club)
-            .stadiumId(matches.getFirst().getStadium().getId())
+            .stadium(matches.getFirst().getStadium())
             .description(dto.description())
             .season(dto.season())
             .year(dto.year())
@@ -192,7 +190,7 @@ public class SeasonPassOfferServiceImpl implements SeasonPassOfferService {
   }
 
   public void createNewSeasonPassType(SeasonPassOffer offer, Long standId, BigDecimal price) {
-    List<Stand> stands = stadiumService.getStadium(offer.getStadiumId()).getStands();
+    List<Stand> stands = offer.getStadium().getStands();
     if (stands.stream().noneMatch(s -> s.getId().equals(standId)))
       throw new ValidationException("La tribuna no pertenece al estadio");
 

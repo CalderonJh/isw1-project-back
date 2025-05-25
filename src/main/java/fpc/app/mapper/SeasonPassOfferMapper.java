@@ -20,6 +20,7 @@ public class SeasonPassOfferMapper {
         .year(offer.getYear())
         .season(offer.getSeason())
         .offerPeriod(new DateRange(offer.getStartDate(), offer.getEndDate()))
+        .stadium(offer.getStadium().getReference())
         .imageId(offer.getImageId())
         .isPaused(offer.isPaused())
         .build();
