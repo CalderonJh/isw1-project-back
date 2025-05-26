@@ -167,7 +167,7 @@ public class SeasonPassOfferServiceImpl implements SeasonPassOfferService {
       offer.validateDateRange();
     }
     if (!offer.getEndDate().equals(dateRange.end())) {
-      offer.setStartDate(dateRange.start());
+      offer.setEndDate(dateRange.end());
       offer.validateEndDate();
     }
     seasonPassOfferRepository.save(offer);
